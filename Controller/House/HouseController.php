@@ -13,7 +13,7 @@ use HOffice\AdminBundle\Form\House\HouseType;
 /**
  * House\House controller.
  *
- * @Route("/itc/house")
+ * @Route("/house")
  */
 class HouseController extends Controller
 {
