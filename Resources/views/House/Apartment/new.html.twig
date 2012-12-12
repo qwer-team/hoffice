@@ -1,0 +1,56 @@
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block menu %}
+    {# скрываем меню #}
+{% endblock %}
+{% block body %}
+<div class = 'menu_sys_top_menu_bg'></div>
+<h1 class = 'menu_sys_h1'>{{ "Apartment creation"|trans({}, "house") }}</h1>
+
+<hr />
+<form action="{{ path('apartment_create') }}" method="post" {{ form_enctype(form) }}>
+    <div class = 'fl'>
+        <button class = 'menu_sys_save_button' type="submit" alt='Сохранить'>  </button>
+    </div>
+    {# какая-то муть по языкам #}
+    <br class = 'clr' />
+    <hr />
+    <div class = 'menu_sys_lang_select'>
+
+
+
+        <br class = 'clr' />
+
+        <div class = 'menu_sys_content_show'>
+    {{ form_widget(form) }}
+
+
+
+        </div>
+    </div>
+
+    <br class="clr" />
+
+    {# какая-то муть по языкам #}
+    {{ form_rest(form) }}
+
+</form>
+{% endblock %}
+
+{#
+<h1>House\Apartment creation</h1>
+
+<form action="{{ path('apartment_create') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+    <p>
+        <button type="submit">Create</button>
+    </p>
+</form>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('apartment') }}">
+            Back to the list
+        </a>
+    </li>
+</ul>
+#}

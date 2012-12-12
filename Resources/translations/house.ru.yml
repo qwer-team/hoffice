@@ -1,0 +1,22 @@
+house_list: House list
+apartment_list: Apartment list
+street: Street
+number: Number
+Houseid: Houseid
+Kod: Kod
+Name: Name
+Floor: Floor
+Rooms: Rooms
+Q_w_meters: Q_w_meters
+S_live: S_live
+S_all: S_all
+S_balcony: S_balcony
+S_wo_balcony: S_wo_balcony
+House edit: House edit
+Apartment edit: Apartment edit
+Apartment creation: Apartment creation
+House creation: House creation
+House\Apartment: House\Apartment
+House\House: House\House
+Edit: Edit
+Delete: Delete

@@ -1,0 +1,145 @@
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block body %}
+<h1 class = 'menu_sys_h1'>{{ "House\Apartment"|trans({}, "house") }}</h1>
+
+<table class="record_properties">
+    <tbody>
+        <tr>
+            <th>{{ "id"|trans }}</th>
+            <td>{{ entity.id }}</td>
+        </tr>
+        <tr>
+            <th>{{ "Houseid"|trans({}, "house") }}</th>
+            <td>{{ entity.houseId }}</td>
+        </tr>
+        <tr>
+            <th>{{ "Kod"|trans({}, "house") }}</th>
+            <td>{{ entity.kod }}</td>
+        </tr>
+        <tr>
+            <th>{{ "Name"|trans({}, "house")}}</th>
+            <td>{{ entity.name }}</td>
+        </tr>
+        <tr>
+            <th>{{ "Floor"|trans({}, "house") }}</th>
+            <td>{{ entity.floor }}</td>
+        </tr>
+        <tr>
+            <th>{{ "Rooms"|trans({}, "house") }}</th>
+            <td>{{ entity.rooms }}</td>
+        </tr>
+        <tr>
+            <th>{{ "Q_w_meters"|trans({}, "house") }}</th>
+            <td>{{ entity.qwmeters }}</td>
+        </tr>
+        <tr>
+            <th>{{ "S_live"|trans({}, "house") }}</th>
+            <td>{{ entity.slive }}</td>
+        </tr>
+        <tr>
+            <th>{{ "S_all"|trans({}, "house") }}</th>
+            <td>{{ entity.sall }}</td>
+        </tr>
+        <tr>
+            <th>{{ "S_balcony"|trans({}, "house") }}</th>
+            <td>{{ entity.sbalcony }}</td>
+        </tr>
+        <tr>
+            <th>{{ "S_wo_balcony"|trans({}, "house") }}</th>
+            <td>{{ entity.swobalcony }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('apartment') }}">
+             {{"Back to the list"|trans}}
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('apartment_edit', { 'id': entity.id }) }}">
+            {{ "Edit"|trans({}, "house") }}
+        </a>
+    </li>
+    <li>
+        <form action="{{ path('apartment_delete', { 'id': entity.id }) }}" method="post">
+            {{ form_widget(delete_form) }}
+            <button type="submit">{{ "Delete"|trans({}, "house") }}</button>
+        </form>
+    </li>
+</ul>
+{% endblock %}
+
+{#
+
+<h1>House\Apartment</h1>
+
+<table class="record_properties">
+    <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ entity.id }}</td>
+        </tr>
+        <tr>
+            <th>Houseid</th>
+            <td>{{ entity.houseId }}</td>
+        </tr>
+        <tr>
+            <th>Kod</th>
+            <td>{{ entity.kod }}</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{ entity.name }}</td>
+        </tr>
+        <tr>
+            <th>Floor</th>
+            <td>{{ entity.floor }}</td>
+        </tr>
+        <tr>
+            <th>Rooms</th>
+            <td>{{ entity.rooms }}</td>
+        </tr>
+        <tr>
+            <th>Q_w_meters</th>
+            <td>{{ entity.qwmeters }}</td>
+        </tr>
+        <tr>
+            <th>S_live</th>
+            <td>{{ entity.slive }}</td>
+        </tr>
+        <tr>
+            <th>S_all</th>
+            <td>{{ entity.sall }}</td>
+        </tr>
+        <tr>
+            <th>S_balcony</th>
+            <td>{{ entity.sbalcony }}</td>
+        </tr>
+        <tr>
+            <th>S_wo_balcony</th>
+            <td>{{ entity.swobalcony }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('apartment') }}">
+             {{"Back to the list"|trans}}
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('apartment_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>
+        <form action="{{ path('apartment_delete', { 'id': entity.id }) }}" method="post">
+            {{ form_widget(delete_form) }}
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+</ul>
+#}

@@ -1,0 +1,153 @@
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block body %}
+
+    {% block menu_sys_header %}
+        <h1 class='menu_sys_h1'>{{ "apartment_list"|trans({}, "house") }}</h1>
+    {% endblock %}
+
+    <br class = 'clr'/>
+    {{ wo_render_breadcrumbs() }}
+
+    <div class = 'menu_sys_main_conteiner'>
+        <div class = 'fr'>
+            <a class = 'new_window addbutton' href="{{ path('apartment_new') }}">
+                {{ "create_a_new_entry"|trans }}
+            </a>
+        </div>
+            
+        <div class="navigation float_left">
+    
+    <div class = 'fl' style = 'padding: 9px 3px;'>
+            {{ entities.render() | raw }}
+    </div>
+    <div class = 'fl' style = 'padding: 6px 3px;'>
+        {% set pagers = [10, 20, 30, 40, 50, 100] %}
+
+        {{ "lines_per_page"|trans }}
+
+        <select class = 'pager_changes'>
+        {% for pager in pagers %}
+
+            {% if pager == coulonpage %}{% set sel = 'selected=selected' %}
+            {% else %}{% set sel = '' %}
+            {% endif %}
+
+            <option value = "{{pager}}" {{ sel }} href="{{ path( 'apartment', { 'houseId': houseId, 'coulonpage':pager }) }}">
+                {{ pager }}
+            </option>
+
+        {% endfor %}
+        </select>
+    </div>
+   
+    
+</div>    
+            
+        <table class="records_list">
+            <thead>
+                <tr>
+                    <th class = 'w50px'>{{ "id"|trans }}</th>
+                    <th class = 'w50px'>{{ "Houseid"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "Kod"|trans({}, "house") }}</th>
+                    <th class = 'w150px'>{{ "Name"|trans({}, "house")}}</th>
+                    <th class = 'w50px'>{{ "Floor"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "Rooms"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "Q_w_meters"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "S_live"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "S_all"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "S_balcony"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "S_wo_balcony"|trans({}, "house") }}</th>
+                    <th class = 'w50px'>{{ "actions"|trans }}</th>
+                </tr>
+            </thead>
+
+            <tbody>  
+                {% for entity in entities %}
+                <tr id="tr_menu_sys_{{entity.id}}" >
+                    <td class = 'center'><a href="{{ path('apartment_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                    <td class = 'center'>{{ entity.houseId }}</td>
+                    <td class = 'center'>{{ entity.kod }}</td>
+                    <td class = 'center'>{{ entity.name }}</td>
+                    <td class = 'center'>{{ entity.floor }}</td>
+                    <td class = 'center'>{{ entity.rooms }}</td>
+                    <td class = 'center'>{{ entity.qwmeters }}</td>
+                    <td class = 'center'>{{ entity.slive }}</td>
+                    <td class = 'center'>{{ entity.sall }}</td>
+                    <td class = 'center'>{{ entity.sbalcony }}</td>
+                    <td class = 'center'>{{ entity.swobalcony }}</td>
+                    <td class = ''>
+                        <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('apartment_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>
+                        <a class = 'menu_sys_delete delete_object'
+                               data-link="#tr_menu_sys_{{entity.id}}" data-form="#menu_sys_delete_{{entity.id}}">
+                    {{ "delete"|trans }}</a> 
+                    <form id="menu_sys_delete_{{entity.id}}" style = 'display:inline-block'  action="{{ path('apartment_delete', { 'id': entity.id }) }}" method="post">
+                        {{ form_widget( delete_form[entity.id]) }}
+                    </form>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class = 'fr'>
+            <a class = 'new_window addbutton' href="{{ path('apartment_new') }}">
+                {{ "create_a_new_entry"|trans }}
+            </a>
+        </div>
+       <br class="clr" />
+    </div>
+ {% endblock %}  
+{#<h1>House\Apartment list</h1>
+
+<table class="records_list">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Houseid</th>
+            <th>Kod</th>
+            <th>Name</th>
+            <th>Floor</th>
+            <th>Rooms</th>
+            <th>Q_w_meters</th>
+            <th>S_live</th>
+            <th>S_all</th>
+            <th>S_balcony</th>
+            <th>S_wo_balcony</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+        <tr>
+            <td><a href="{{ path('apartment_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+            <td>{{ entity.houseId }}</td>
+            <td>{{ entity.kod }}</td>
+            <td>{{ entity.name }}</td>
+            <td>{{ entity.floor }}</td>
+            <td>{{ entity.rooms }}</td>
+            <td>{{ entity.qwmeters }}</td>
+            <td>{{ entity.slive }}</td>
+            <td>{{ entity.sall }}</td>
+            <td>{{ entity.sbalcony }}</td>
+            <td>{{ entity.swobalcony }}</td>
+            <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('apartment_show', { 'id': entity.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('apartment_edit', { 'id': entity.id }) }}">edit</a>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<ul>
+    <li>
+        <a href="{{ path('apartment_new') }}">
+            Create a new entry
+        </a>
+    </li>
+</ul>
+#}

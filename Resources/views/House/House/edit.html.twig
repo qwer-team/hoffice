@@ -1,0 +1,79 @@
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block menu %}
+    {# скрываем меню #}
+{% endblock %}
+{% block body %}
+<div class = 'menu_sys_top_menu_bg'></div>
+<h1 class = 'menu_sys_h1'>{{ "House edit"|trans({}, "house") }}</h1>
+
+<hr />
+<form action="{{ path('house_delete', { 'id': entity.id }) }}" method="post">
+    {{ form_widget(delete_form) }}
+    <button class = 'menu_sys_delete_button' type="submit" alt='Delete'></button>
+</form>
+
+
+<form action="{{ path('house_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }}>
+    <div class = 'fl'>
+        <button class = 'menu_sys_save_button' type="submit" alt='Сохранить'>  </button>
+    </div>
+    {# какая-то муть по языкам #}
+    <br class = 'clr' />
+    <hr />
+    <div class = 'menu_sys_lang_select'>
+
+
+
+        <br class = 'clr' />
+
+        <div class = 'menu_sys_content_show'>
+    {{ form_widget(edit_form) }}
+
+
+
+        </div>
+    </div>
+
+    <br class="clr" />
+
+    {# какая-то муть по языкам #}
+    {{ form_rest(edit_form) }}
+
+</form>
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+{#
+
+<h1>House\House edit</h1>
+
+<form action="{{ path('house_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }}>
+    {{ form_widget(edit_form) }}
+    <p>
+        <button type="submit">Edit</button>
+    </p>
+</form>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('house') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <form action="{{ path('house_delete', { 'id': entity.id }) }}" method="post">
+            {{ form_widget(delete_form) }}
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+</ul>
+#}
