@@ -13,39 +13,30 @@ use HOffice\AdminBundle\Form\House\ApartmentType;
 /**
  * House\Apartment controller.
  *
- * @Route("/itc/apartment")
+ * @Route("/apartment")
  */
 class ApartmentController extends Controller
 {
     /**
      * Lists all House\Apartment entities.
      *
-      @Route("/{coulonpage}/{houseId}", name="apartment",
-     * requirements={"houseId" = "\d+", "coulonpage" = "\d+"}, 
-     * defaults={ "houseId"=null,"coulonpage"="20"})
+      @Route("/{coulonpage}/{parent_id}", name="apartment",
+     * requirements={"parent_id" = "\d+", "coulonpage" = "\d+"}, 
+     * defaults={ "parent_id"=null,"coulonpage"="20"})
      * 
      * @Template()
      */
-    public function indexAction($houseId=null, $coulonpage = 20)
+    public function indexAction($parent_id=null, $coulonpage = 20)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $qb = $em->getRepository('HOfficeAdminBundle:House\Apartment')
+                   ->selApart($parent_id, $coulonpage);
         
-        $repo = $em->getRepository('HOfficeAdminBundle:House\Apartment');
-        if(null === $houseId)
-        {
-            $qb = $repo->createQueryBuilder('M')
-                        ->orderBy('M.kod');
-        }
-        else
-        {
-            $qb = $repo->createQueryBuilder('M')
-                        ->where('M.houseId = :houseId')
-                        ->setParameter('houseId', $houseId)
-                        ->orderBy('M.kod');
-            
-        }
-         
+        $par=null;
+        if($parent_id != null)
+        $par = $this->getDoctrine()->getManager()->getRepository('HOfficeAdminBundle:House\House')->find($parent_id); 
+        
         $paginator = $this->get('knp_paginator');
         $entities = $paginator->paginate(
             $qb,
@@ -62,7 +53,8 @@ class ApartmentController extends Controller
         return array(
             'entities' => $entities,
             'delete_form' => $deleteForm,
-            'houseId' => $houseId,
+            'par'   => $par,
+            'parent_id' => $parent_id,
             'coulonpage'   => $coulonpage,
         );
     }
@@ -92,18 +84,38 @@ class ApartmentController extends Controller
 
     /**
      * Displays a form to create a new House\Apartment entity.
-     *
-     * @Route("/new", name="apartment_new")
+     * @Route("/new/{parent_id}", name="apartment_new",
+     * requirements={"parent_id" = "\d+"}, defaults={ "parent_id" = null})
      * @Template()
-     */
-    public function newAction()
+    */
+    
+    public function newAction($parent_id)
     {
+//        $entity = new Apartment();
+//        $form   = $this->createForm(new ApartmentType(), $entity);
+//
+//        return array(
+//            'entity' => $entity,
+//            'form'   => $form->createView(),
+//        );
+        
+        $em = $this->getDoctrine()->getManager();
         $entity = new Apartment();
-        $form   = $this->createForm(new ApartmentType(), $entity);
+        //$languages = $this->getLanguages();
+        if( null !== $parent_id )
+        {
+            $parent = 
+                $em->getRepository('HOfficeAdminBundle:House\House')->find($parent_id);
+            $entity->setHouse($parent);
+        }
+        $form = $this->createForm(new ApartmentType(/*$this->getLocale(), $languages*/), $entity);
 
         return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
+            'entity'     => $entity,
+            //'image_form' => $imageForm->createView(),
+            'form'       => $form->createView(),
+            //'languages'  => $languages,
+            //'locale'     => $this->getLocale(),
         );
     }
 

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Apartment
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="HOffice\AdminBundle\Entity\House\ApartmentRepository")
  */
 class Apartment
 {
@@ -92,8 +92,7 @@ class Apartment
     private $s_wo_balcony;
 
     /**
-     * @ORM\JoinColumn(name="houseId", referencedColumnName="id",
-     * onDelete="CASCADE")
+     * @ORM\JoinColumn(name="houseId", referencedColumnName="id")
      * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\House\House", inversedBy="apartments")
      */
     private $house;

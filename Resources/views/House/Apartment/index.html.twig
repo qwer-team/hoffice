@@ -4,45 +4,19 @@
     {% block menu_sys_header %}
         <h1 class='menu_sys_h1'>{{ "apartment_list"|trans({}, "house") }}</h1>
     {% endblock %}
-
+        
+    {% if par != null %}
+        <h1><a  href="{{ path('house') }}">{{ "street"|trans({}, "house") }}: {{par.street}} {{ "number"|trans({}, "house") }}: {{par.number}}</a></h1>
+    {% endif %}
+        
     <br class = 'clr'/>
     {{ wo_render_breadcrumbs() }}
 
     <div class = 'menu_sys_main_conteiner'>
-        <div class = 'fr'>
-            <a class = 'new_window addbutton' href="{{ path('apartment_new') }}">
-                {{ "create_a_new_entry"|trans }}
-            </a>
-        </div>
-            
-        <div class="navigation float_left">
-    
-    <div class = 'fl' style = 'padding: 9px 3px;'>
-            {{ entities.render() | raw }}
-    </div>
-    <div class = 'fl' style = 'padding: 6px 3px;'>
-        {% set pagers = [10, 20, 30, 40, 50, 100] %}
-
-        {{ "lines_per_page"|trans }}
-
-        <select class = 'pager_changes'>
-        {% for pager in pagers %}
-
-            {% if pager == coulonpage %}{% set sel = 'selected=selected' %}
-            {% else %}{% set sel = '' %}
-            {% endif %}
-
-            <option value = "{{pager}}" {{ sel }} href="{{ path( 'apartment', { 'houseId': houseId, 'coulonpage':pager }) }}">
-                {{ pager }}
-            </option>
-
-        {% endfor %}
-        </select>
-    </div>
-   
-    
-</div>    
-            
+    {% block navigation %}    
+        {% include 'ItcAdminBundle::navigator.html.twig' with {'route': 'apartment'} %}
+        {% include 'ItcAdminBundle::addnew.html.twig' with {'route': 'apartment'} %}
+    {% endblock %} 
         <table class="records_list">
             <thead>
                 <tr>
@@ -87,11 +61,7 @@
             {% endfor %}
             </tbody>
         </table>
-        <div class = 'fr'>
-            <a class = 'new_window addbutton' href="{{ path('apartment_new') }}">
-                {{ "create_a_new_entry"|trans }}
-            </a>
-        </div>
+            {{ block("navigation") }}
        <br class="clr" />
     </div>
  {% endblock %}  
