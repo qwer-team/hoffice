@@ -11,9 +11,7 @@ use HOffice\AdminBundle\Entity\Contract\ContractTranslation;
 
 /**
  * HOffice\AdminBundle\Entity\Contract\Contract
- * @Gedmo\Tree(type="closure")
- * @Gedmo\TreeClosure(class="HOffice\AdminBundle\Entity\Contract\ContractClosure")
- * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\ClosureTreeRepository")
+ * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks 
  * @ORM\Table()
  */
@@ -28,23 +26,6 @@ class Contract extends TranslatableEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @var integer $parent_id
-     *
-     * @ORM\Column(name="parent_id", type="integer", nullable=true)
-     */
-    protected $parent_id;
-    /**
-     * @Gedmo\TreeParent
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
-     * @ORM\ManyToOne(targetEntity="Contract", inversedBy="children")
-     * 
-     */
-    protected $parent;
-    /**
-     * @ORM\OneToMany(targetEntity="Contract", mappedBy="parent")
-     **/
-    protected $children;
 
     /**
      * @var integer
@@ -77,7 +58,7 @@ class Contract extends TranslatableEntity
     /**
      * @var integer
      *
-     * @ORM\Column(name="user_id", type="integer")
+     * @ORM\Column(name="user_id", type="integer", nullable=true)
      */
     private $user_id;
 
@@ -167,29 +148,6 @@ class Contract extends TranslatableEntity
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set parent_id
-     *
-     * @param integer $parentId
-     * @return Contract
-     */
-    public function setParentId($parentId)
-    {
-        $this->parent_id = $parentId;
-    
-        return $this;
-    }
-
-    /**
-     * Get parent_id
-     *
-     * @return integer 
-     */
-    public function getParentId()
-    {
-        return $this->parent_id;
     }
 
     /**

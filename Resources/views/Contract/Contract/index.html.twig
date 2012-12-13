@@ -21,10 +21,6 @@
         
      {% block header %}
         {{ wo_render_breadcrumbs() }}
-{#        <form action="{{ path('contract_search') }}" method="post" >
-            <button >
-        </form>
-#}                            
         <div class = 'menu_sys_main_conteiner'>
         <div class="menu_sys_upper_form">
             <form action="{{ path('contract_search') }}" method="post" {{ form_enctype(search_form) }}>
@@ -40,6 +36,12 @@
                 </div>
                 <div class = 'fl'>
                     {{ form_row(search_form['house']) }}         
+                </div>                                   
+                    {% set class %}
+                        {% if search_form['apartment_id'] is null %}hidden{% endif %}
+                    {% endset %}{{ class }}
+                <div class = 'fl {{ class }}'>
+                    {{ form_row(search_form['apartment_id']) }}         
                 </div>                                   
               {{ form_widget(search_form) }}
                 <br class="clr">
@@ -65,7 +67,6 @@
     <thead>
         <tr>
             <th>Id</th>
-            <th>Parent_id</th>
             <th>Kod</th>
             <th>Serial_number</th>
             <th>Title</th>
@@ -80,7 +81,6 @@
     {% for entity in entities %}
         <tr>
             <td class = 'w50px right'><a href="{{ path('contract_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-            <td class = 'w50px right'>{{ entity.parentid }}</td>
             <td class = 'w50px right'>{{ entity.kod }}</td>
             <td class = 'w50px right'>{{ entity.serialnumber }}</td>
             <td >{{ entity.title }}</td>

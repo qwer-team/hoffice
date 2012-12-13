@@ -81,7 +81,7 @@ class SearchContractType extends AbstractType
                 $builder->add('apartment_id', 'choice', array(
                                 'required' => NULL,
                                 'attr' => array(
-                                    'class' => 'search_apartment_id' )
+                                    'class' => 'search_apartment_id' ),
                                 )) ;
             }
     }

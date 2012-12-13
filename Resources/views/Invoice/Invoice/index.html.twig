@@ -1,0 +1,61 @@
+<h1>Invoice\Invoice list</h1>
+
+<table class="records_list">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Pdtype_id</th>
+            <th>N</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Oa1</th>
+            <th>Oa2</th>
+            <th>Txt1</th>
+            <th>Txt2</th>
+            <th>Summa1</th>
+            <th>Summa2</th>
+            <th>Summa3</th>
+            <th>Ucor</th>
+            <th>Dtcor</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+        <tr>
+            <td><a href="{{ path('invoice_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+            <td>{{ entity.pdtypeid }}</td>
+            <td>{{ entity.N }}</td>
+            <td>{% if entity.date %}{{ entity.date|date('Y-m-d H:i:s') }}{% endif %}</td>
+            <td>{{ entity.status }}</td>
+            <td>{{ entity.oa1 }}</td>
+            <td>{{ entity.oa2 }}</td>
+            <td>{{ entity.txt1 }}</td>
+            <td>{{ entity.txt2 }}</td>
+            <td>{{ entity.summa1 }}</td>
+            <td>{{ entity.summa2 }}</td>
+            <td>{{ entity.summa3 }}</td>
+            <td>{{ entity.ucor }}</td>
+            <td>{% if entity.dtcor %}{{ entity.dtcor|date('Y-m-d H:i:s') }}{% endif %}</td>
+            <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('invoice_show', { 'id': entity.id }) }}">show</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('invoice_edit', { 'id': entity.id }) }}">edit</a>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<ul>
+    <li>
+        <a href="{{ path('invoice_new') }}">
+            Create a new entry
+        </a>
+    </li>
+</ul>
