@@ -16,7 +16,7 @@
 
 <div class = 'menu_sys_main_conteiner'>
 
-<h1>Contract\Contract edit</h1>
+<h1>Contract\Contract create</h1>
 <hr />
 
 <form action="{{ path('contract_create', { 'id': entity.id }) }}" method="post" {{ form_enctype(form) }}>
@@ -24,9 +24,6 @@
         <button class = 'menu_sys_save_button' type="submit" alt="{{ "save"|trans }}"></button>
     </div>
     <div class = 'menu_sys_upper_form fl'>
-        <div class = 'fl'>
-            {{ form_row( form.parent_id ) }}
-        </div>
         <div class = 'fl'>
             {{ form_row( form.kod ) }}
         </div>
@@ -40,12 +37,24 @@
             {{ form_row( form.registered ) }}
         </div>
         <br class="clr"/>       
-        <div style="position: relative; top: 5px; right: 10px; height: 10px;"> </div>
-        <div class = 'fl'>
-            {{ form_row( form.user ) }}
+        <div style="position: relative; top: 5px; right: 10px; height: 10px;"> 
         </div>
         <div class = 'fl'>
-            {{ form_row( form.apartment ) }}
+            <input type="hidden" class='search_house_id' />
+            House <input type="text" class="entity_search w250px" 
+                    data-link=".search_house_id"
+                    data-type-link="input"
+                    data-route="ajax_search_house"
+                    data-after-search=".loadApartametData" />
+            <input type='hidden' class='loadApartametData'
+                    data-link=".search_apartment_id"
+                    data-route="ajax_search_apartment" />
+        </div>
+        <div class = 'fl'>
+            {{ form_row( form.serial_number ) }}
+        </div>
+        <div class = 'fl'>
+            {{ form_row( form.user ) }}
         </div>
     </div>
         

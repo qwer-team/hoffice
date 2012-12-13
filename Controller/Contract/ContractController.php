@@ -46,16 +46,6 @@ class ContractController extends Controller
                         ->innerJoin('M.apartment', 'A')
                         ->orderBy('M.kod', 'ASC');    
         
-        if(null === $parent_id)
-        {
-            $qb->where('M.parent IS NULL');
-        }
-        else
-        {
-            $qb->where('M.parent = :parent')
-               ->setParameter('parent', $parent_id);
-        }
-
         $paginator = $this->get('knp_paginator');
         $entities = $paginator->paginate(
             $qb,
@@ -94,7 +84,6 @@ class ContractController extends Controller
         $changeKodForm = array();        
         $data = $search_form->getData();
         
-        print_r($data["house_id"]);
         $repo = $em->getRepository('HOfficeAdminBundle:Contract\Contract');
         
         $qb = $repo->createQueryBuilder('M')
@@ -216,20 +205,26 @@ class ContractController extends Controller
     public function createAction(Request $request)
     {
         $entity  = new Contract();
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
+
         $form = $this->createForm(new ContractType(), $entity);
         $form->bind($request);
-
+        $data = $form->getData();
+        print_r($data);
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('contract_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('contract_edit', array('id' => $entity->getId())));
         }
 
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
         );
     }
 
@@ -334,6 +329,7 @@ class ContractController extends Controller
     
     private function getKodeForContract($parent_id)
     {
+        return 1;
         $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em->getRepository('HOfficeAdminBundle:Contract\Contract')
                                         ->createQueryBuilder('M')
