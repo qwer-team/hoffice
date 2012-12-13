@@ -54,8 +54,9 @@ class Service
 
     /**
      * @ORM\ManyToOne(targetEntity="Itc\AdminBundle\Entity\Unit\Unit")
-     * @ORM\JoinColumn(name="unit_id", referencedColumnName="id")
-     **/
+     * @ORM\JoinColumn(name="unit_id", referencedColumnName="id",
+     * nullable=true)
+     */
     private $unit;
 
     /**

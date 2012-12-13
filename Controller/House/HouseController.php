@@ -127,12 +127,10 @@ class HouseController extends Controller
         }
 
         $editForm = $this->createForm(new HouseType(), $entity);
-        $deleteForm = $this->createDeleteForm($id);
 
         return array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         );
     }
 
@@ -152,8 +150,6 @@ class HouseController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find House\House entity.');
         }
-
-        $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createForm(new HouseType(), $entity);
         $editForm->bind($request);
 
@@ -167,7 +163,6 @@ class HouseController extends Controller
         return array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         );
     }
 
@@ -189,11 +184,16 @@ class HouseController extends Controller
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find House\House entity.');
             }
-
-            $em->remove($entity);
-            $em->flush();
-        }
-
+            $res= $em->remove($entity); 
+           
+            try{
+              $em->flush();
+            }
+            catch(\Exception $e)
+            {
+                throw $this->createNotFoundException('ERROR');
+            }
+        }   
         return $this->redirect($this->generateUrl('house'));
     }
 
