@@ -28,7 +28,7 @@
             {% for entity in entities %}
                 <tr id="tr_menu_sys_{{entity.id}}" >
                     <td class = 'center'><a href="{{ path('house_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                    <td class = 'center'><a href="{{ path('apartment', { 'houseId': entity.id}) }}">{{ entity.street }}</a></td>
+                    <td class = 'center'><a href="{{ path('apartment', { 'parent_id': entity.id}) }}">{{ entity.street }}</a></td>
                     <td class = 'center'>{{ entity.number }}</td>
                     <td class = ''>
                         <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('house_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>

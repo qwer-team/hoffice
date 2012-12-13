@@ -1,0 +1,112 @@
+
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block search %}
+
+{% endblock %}
+{% block javascript %}
+    {{ parent() }}
+    {#{{ form_javascript(search_form) }}#}
+{% endblock %}
+{% block css %}
+    {{ parent() }}
+{#    {{ form_stylesheet(search_form) }}#}
+{% endblock %}
+{% block menu %}
+    {{ parent() }}
+{% endblock%}
+
+{% block body %}
+
+<h1>Contract\Contract list</h1>
+        
+     {% block header %}
+        {{ wo_render_breadcrumbs() }}
+{#        <form action="{{ path('contract_search') }}" method="post" >
+            <button >
+        </form>
+#}                            
+        <div class = 'menu_sys_main_conteiner'>
+        <div class="menu_sys_upper_form">
+            <form action="{{ path('contract_search') }}" method="post" {{ form_enctype(search_form) }}>
+                <div class = 'fl'>
+                    <label style="line-height: 16px">{{ "search"|trans }}:&#160;</label>
+                    {{ form_widget(search_form['text']) }}         
+                </div>
+                <div class = 'fl'>
+                    {{ form_row(search_form['serial_number']) }}         
+                </div>
+                <div class = 'fl'>
+                    {{ form_row(search_form['user']) }}         
+                </div>
+                <div class = 'fl'>
+                    {{ form_row(search_form['house']) }}         
+                </div>                                   
+              {{ form_widget(search_form) }}
+                <br class="clr">
+                <div class = 'fl'>
+                    <button type="submit">{{ "find"|trans }}</button>
+                </div>
+            </form>
+        </div>
+        <br class="clr">
+        <hr />
+        {% set route = app.request.get('_route') %}
+
+        {% if route != path('contract_search') %}
+            {% include 'ItcAdminBundle::navigator.html.twig' with {'route': 'contract'} %}
+        {% endif %}
+
+        {% block navigation %}    
+            {% include 'ItcAdminBundle::addnew.html.twig' with {'route': 'contract'} %}
+        {% endblock %}    
+    {% endblock %}
+
+<table class="records_list">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Parent_id</th>
+            <th>Kod</th>
+            <th>Serial_number</th>
+            <th>Title</th>
+            <th>Registered</th>
+            <th>User_id</th>
+            <th>Flat_id</th>
+            <th>Sale</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+        <tr>
+            <td class = 'w50px right'><a href="{{ path('contract_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+            <td class = 'w50px right'>{{ entity.parentid }}</td>
+            <td class = 'w50px right'>{{ entity.kod }}</td>
+            <td class = 'w50px right'>{{ entity.serialnumber }}</td>
+            <td >{{ entity.title }}</td>
+            <td class = 'center w50px'>{{ entity.registered }}</td>
+            <td class = 'center w250px'>{{ entity.user.fio }}</td>
+            <td class = 'center w50px'>{{ entity.apartment.name }}</td>
+            <td class = 'center w50px'>{{ entity.sale }}</td>
+            <td class = 'center w100px'>
+                <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('contract_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+                
+    {% block bottom %}
+
+    {{ block("navigation") }}
+        {% set route = app.request.get('_route') %}
+        {% if route != path('menu_search') %}
+        <div class="navigation" class = 'float_left'>
+            {{ entities.render() | raw }}
+        </div>
+
+        </div>
+        {% endif %}
+    {% endblock %}
+                
+{% endblock %}
