@@ -37,7 +37,7 @@ class ServiceController extends Controller
         echo "<pre>";
         foreach($log as $l)
         {
-            print_r($l);
+            print_r($l->getData());
         }
         echo "</pre>";
         */
