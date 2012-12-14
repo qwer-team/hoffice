@@ -1,0 +1,11 @@
+documents_index:
+    pattern: /itc/{_locale}
+    defaults: { _controller: HOfficeAdminBundle:Payment\Payment:index, _locale: %locale% }
+    
+documents:
+    prefix:   /itc/{_locale}
+    resource: "@HOfficeAdminBundle/Controller/"
+    type:     annotation
+    defaults: {_locale: %locale% }
+    requirements:
+      _locale : \w{2}        
