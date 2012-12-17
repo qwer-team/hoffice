@@ -24,103 +24,39 @@ use Itc\AdminBundle\Tools\LanguageHelper;
 class PaymentController extends BaseController {
     
     private $payment = "HOfficeAdminBundle:Payment\Payment";
+
     /**
      * Lists all Payment\Payment entities.
      *
-     * @Route("/", name="payment")
+     * @Route(
+     *  "/{coulonpage}/{page}", name="payment",
+     *      requirements={"coulonpage" = "\d+", "page" = "\d+"}, 
+     *      defaults={ "coulonpage"="10", "page"=1 } 
+     * )
      * @Template()
      */
-    public function indexAction() {
+    public function indexAction( $coulonpage = 10, $page ) {
 
-        $em = $this->getDoctrine()->getManager();
+        $select = "SUM( P.summa1 ) AS summa1, 
+                   SUM( P.summa2 ) AS summa2, 
+                   SUM( P.summa3 ) AS summa3";
 
-        $entities = $em->getRepository( $this->payment )->findAll();
-
-        $summa    = $em->getRepository( $this->payment )
-                    ->createQueryBuilder( "P" )
-                    ->select( "SUM( P.summa1 ) AS summa1, 
-                               SUM( P.summa2 ) AS summa2, 
-                               SUM( P.summa3 ) AS summa3" )
-                    ->getQuery()
-                    ->getOneOrNullResult();
+        $summa  = $this->getQbAllJoins($select)
+                       ->getQuery()
+                       ->getOneOrNullResult();
 
         $search_form = $this->createForm( new SearchPaymentType( ) );
 
-        return array(
-
-            'entities' => $entities,
-            'summa'    => $summa,
-            'search_form' => $search_form->createView(),
-
-        );
-
-    }
-
-    /**
-     * @Route("/{coulonpage}/search", name="payment_search",
-     * requirements={"coulonpage" = "\d+"}, 
-     * defaults={"coulonpage" = "100"})
-     * @Template("HOfficeAdminBundle:Payment\Payment:index.html.twig")
-     */
-    public function searchAction( Request $request, $coulonpage = 100 ){
-
-        $locale = LanguageHelper::getLocale();
-        $search_form = $this->createForm( new SearchPaymentType( ) );
-
-        $data = $search_form->bind( $request )
-                            ->getData();
-        echo "fuck off";
-        $em = $this->getDoctrine()->getManager();
-        $entities = $em->getRepository( $this->payment )
-                       ->createQueryBuilder( "P, C, U, A, H" )
-                       ->join( "C.contract", "P" )
-                       ->join( "U.user", "C" )
-                       ->join( "A.contract", "C" )
-                       ->join( "H.home", "A" )
-                ;
         
-        $parameters = NULL;
-        $qb = array();
-
-        if( null !== $data["text"] ){
-
-            $parameters['id']     = 
-            $parameters['N']      = 
-            $parameters['summa1'] = 
-            $parameters['summa2'] = 
-            $parameters['summa3'] = $data["text"];
-
-            $qb = $this->searchHelper( $parameters, $this->payment, $qb, "OR", "=" );
-            unset( $parameters );
-
-        }
-
-        $qb = $this->getDateQb( $this->payment, $data, $qb );
-        
-        print_R( ! empty( $qb ) );
-        if( empty( $qb ) ){
-            
-            return $this->redirect( $this->generateUrl( 'payment', array() ) );
-
-        }
-
-        $page = $this->get('request')->query->get('page', 1);
+        $page     = $this->get('request')->query->get( 'page', $page );
         $entities = $this->get('knp_paginator')
-                         ->paginate( $qb, $page, $coulonpage );
+                         ->paginate( $this->getQbAllJoins(), $page, $coulonpage );
 
-        $summa    = $em->getRepository( $this->payment )
-                    ->createQueryBuilder( "P" )
-                    ->select( "SUM( P.summa1 ) AS summa1, 
-                               SUM( P.summa2 ) AS summa2, 
-                               SUM( P.summa3 ) AS summa3" )
-                    ->getQuery()
-                    ->getOneOrNullResult();
-        
         return array(
 
-            'summa'    => $summa,
+            'summa'       => $summa,
             'entities'    => $entities,
-            'locale'      => $locale,
+            'locale'      => LanguageHelper::getLocale(),
             'parent_id'   => null,
             'chmap'       => array(),
             'search_form' => $search_form->createView(),
@@ -131,17 +67,110 @@ class PaymentController extends BaseController {
 
     }
 
+    protected function getQbAllJoins( $select = NULL ){
+
+        $select = ( $select === NULL ) ? "P, C, U": $select;
+        
+        $em = $this->getDoctrine()->getManager();
+        $qb = $em->getRepository( $this->payment )
+                 ->createQueryBuilder( "P" )
+                 ->select( $select )
+                 ->innerJoin( 'P.contract', 'C')
+                 ->innerJoin( 'C.user', 'U')
+                 ->innerJoin( 'C.apartment', 'A');
+
+        return $qb;
+
+    }
+
+        /**
+     * @Route("/{coulonpage}/search", name="payment_search",
+     * requirements={"coulonpage" = "\d+"}, 
+     * defaults={"coulonpage" = "100"})
+     * @Template("HOfficeAdminBundle:Payment\Payment:index.html.twig")
+     */
+    public function searchAction( Request $request, $coulonpage = 100 ){
+
+        $postData = $request->request->get('itc_documentsbundle_searchpaymenttype');
+        $house_id = $postData['house_id'];
+        $search_form = $this->createForm( new SearchPaymentType( $house_id ) );
+
+        $data = $search_form->bind( $request )
+                            ->getData();
+
+        $qb = $this->getSearchQuery( NULL, $data );
+
+        if( empty( $qb ) ){
+            
+            return $this->redirect( $this->generateUrl( 'payment', array() ) );
+
+        }
+
+        $page     = $this->get('request')->query->get('page', 1);
+        $entities = $this->get('knp_paginator')
+                         ->paginate( $qb, $page, $coulonpage );
+
+        $select = "SUM( P.summa1 ) AS summa1, 
+                   SUM( P.summa2 ) AS summa2, 
+                   SUM( P.summa3 ) AS summa3";
+        $summa = $this->getSearchQuery( $select, $data )
+                      ->getQuery()
+                      ->getOneOrNullResult();
+
+        return array(
+
+            'summa'       => $summa,
+            'entities'    => $entities,
+            'locale'      => LanguageHelper::getLocale(),
+            'parent_id'   => null,
+            'chmap'       => array(),
+            'search_form' => $search_form->createView(),
+            'delete_form' => $this->getDeleteForm( $entities ),
+            'coulonpage'  => $coulonpage,
+
+        );
+
+    }
+    
+    function getSearchQuery( $select, $data ){
+        
+        $this->resetParam();
+
+        $qb = $this->getQbAllJoins( $select );
+
+        $f[] = array( "n"=>'text',"f"=>array("id","N","summa1", "summa2", "summa3"), "values" => array( "OR", "=", "P" ) );
+        $f[] = array( "n"=>'user',"f"=>array("user"), "values" => array( "AND", "=", "C" ) );
+        $f[] = array( "n"=>'house_id',"f"=>array("house"), "values" => array( "AND", "=", "A" ) );
+        $f[] = array( "n"=>'apartment_id',"f"=>array("apartment"), "values" => array( "AND", "=", "C" ) );
+
+        foreach( $f as $k => $v ){
+
+            $name = $data[$v['n']];
+
+            if( null !== $name ){
+
+                foreach( $v['f'] as $field ){
+                    $parameters[$field] = $name;
+                }
+
+                $qb = $this->searchHelper( $parameters, $this->payment, $qb, $v['values'] );
+                unset( $parameters );
+            }
+        }
+        
+        return $qb = $this->getDateQb( $this->payment, $data, $qb );
+    }
+
     /**
      * Finds and displays a Payment\Payment entity.
      *
      * @Route("/{id}/show", name="payment_show")
      * @Template()
      */
-    public function showAction($id)
+    public function showAction( $id )
     {
         return $this->redirect(
-                $this->generateUrl( 'payment_edit', 
-                                    array( 'id' => $id )
+                $this->generateUrl( 'payment_edit', array( 'id' => $id )
                 )
         );
     }
@@ -287,12 +316,12 @@ class PaymentController extends BaseController {
         }
         
         $rArray = array( "id" => $id );
+
         return $this->redirect( $this->generateUrl( 'payment_edit', $rArray ) );
 
     }
 
-
-        /**
+    /**
      * Edits an existing Payment\Payment entity.
      *
      * @Route("/{id}/update", name="payment_update")
@@ -353,5 +382,18 @@ class PaymentController extends BaseController {
         return $this->redirect($this->generateUrl('payment'));
     }
 
+    /**
+     * Edits an existing Menu entity.
+     * BaseController
+     * 
+     * @Route("/{id}/payment_delete_ajax", name="payment_delete_ajax")
+     * defaults={"_format" = "json"})
+     * @Method("POST")
+     * @Template("ItcAdminBundle:Menu:deleteMenu.json.twig")
+     */
+    public function deletePaymentAjaxAction( Request $request, $id )
+    {
+        $this->deleteEntityById( $id,  $this->payment, $request );
+    }
     
 }

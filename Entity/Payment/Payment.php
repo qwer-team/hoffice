@@ -17,15 +17,20 @@ use \Itc\DocumentsBundle\Entity\Pd\Pd;
 class Payment extends Pd {
 
     /**
-     * @ORM\JoinColumn
-     * (
-     *      name="contractId", 
-     *      referencedColumnName="id"
-     * )
+     * @var integer
+     *
+     * @ORM\Column(name="contract_id", type="integer", nullable=true)
+     */
+    private $contract_id;
+    /**
      * @ORM\ManyToOne
      * (
-     *      targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", 
-     *      inversedBy="id"
+     *      targetEntity="HOffice\AdminBundle\Entity\Contract\Contract"
+     * )
+     * @ORM\JoinColumn
+     * (
+     *      name="contract_id", 
+     *      referencedColumnName="id"
      * )
      */
     private $contract;
@@ -54,13 +59,36 @@ class Payment extends Pd {
     }
 
     /**
-     * Get contract
+     * Get contractId
      *
      * @return integer 
      */
     public function getContract()
     {
         return $this->contract;
+    }
+    
+    /**
+     * Set contractId
+     *
+     * @param integer $contractId
+     * @return PaymentPayment
+     */
+    public function setContractId( $contractId )
+    {
+        $this->contract_id = $contractId;
+    
+        return $this;
+    }
+
+    /**
+     * Get contractId
+     *
+     * @return integer 
+     */
+    public function getContractId()
+    {
+        return $this->contract_id;
     }
 
 }

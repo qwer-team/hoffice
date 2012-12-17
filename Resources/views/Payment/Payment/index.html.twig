@@ -27,10 +27,19 @@
             </form>
         </div>
         
-        {% block navigation %}    
-            {#% include 'ItcAdminBundle::navigator.html.twig' with {'route': 'payment'} %#}
-            {% include 'ItcAdminBundle::addnew.html.twig' with {'route': 'payment', 'parent_id': NULL } %}
-        {% endblock %} 
+        {% block navigation %}
+
+            {% set q = 'payment'%}
+            {% set route = app.request.get('_route') %}
+            {% if route != path( q~'_search' ) %}
+
+                {% include 'ItcAdminBundle::navigator.html.twig' with {'route': q } %}
+
+            {% endif %}
+
+            {% include 'ItcAdminBundle::addnew.html.twig' with {'route': q } %}
+
+        {% endblock %}
 
         <table class="records_list">
             <thead>
@@ -46,6 +55,8 @@
                     <th>Summa1</th>
                     <th>Summa2</th>
                     <th>Summa3</th>
+                    <th>House</th>
+                    <th>Apart</th>
                     <th>Ucor</th>
                     <th>Dtcor</th>
                     <th>Actions</th>
@@ -67,8 +78,14 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             {% for entity in entities %}
+                
+                {% set contract = entity.getContract() %}
+                {% set apartment = contract.getApartment() %}
+                
                 <tr>
                     <td><a href="{{ path('payment_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                     <td>{{ entity.N }}</td>
@@ -81,17 +98,19 @@
                     <td>{{ entity.summa1 }}</td>
                     <td>{{ entity.summa2 }}</td>
                     <td>{{ entity.summa3 }}</td>
+                    <td>{{ apartment.getHouse().street }} {{ apartment.getHouse().number }}</td>
+                    <td>{{ apartment.getName() }}</td>
                     <td>{{ entity.ucor }}</td>
                     <td>{% if entity.dtcor %}{{ entity.dtcor|date('Y-m-d H:i:s') }}{% endif %}</td>
                     <td>
-                        <ul>
-                            <li>
-                                <a href="{{ path('payment_show', { 'id': entity.id }) }}">show</a>
-                            </li>
-                            <li>
-                                <a href="{{ path('payment_edit', { 'id': entity.id }) }}">edit</a>
-                            </li>
-                        </ul>
+                        <a class='menu_sys_delete delete_object'
+                           data-link="#tr_{{ entity.id }}" data-form="#delete_{{entity.id}}">
+                            {{ "delete"|trans }}
+                        </a>
+                        <form id="delete_{{entity.id}}" action="{{ path('payment_delete_ajax', { 'id': entity.id }) }}" method="post">
+                            {{ form_rest(delete_form[entity.id]) }}
+                        </form>  
+                        <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('payment_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>
                     </td>
                 </tr>
             {% endfor %}
