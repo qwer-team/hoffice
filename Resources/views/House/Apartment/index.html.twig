@@ -51,9 +51,10 @@
                     <td class = 'center'>{{ entity.swobalcony }}</td>
                     <td class = ''>
                         <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('apartment_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>
-                        <a class = 'menu_sys_delete delete_object'
+                        <a class = 'menu_sys_delete delete_object_VErrTest'
                                data-link="#tr_menu_sys_{{entity.id}}" data-form="#menu_sys_delete_{{entity.id}}">
                     {{ "delete"|trans }}</a> 
+                        <div id="VErrTest" hidden="hidden">{{ "the object is not empty"|trans({}, "house") }}</div>
                     <form id="menu_sys_delete_{{entity.id}}" style = 'display:inline-block'  action="{{ path('apartment_delete', { 'id': entity.id }) }}" method="post">
                         {{ form_widget( delete_form[entity.id]) }}
                     </form>

@@ -4,7 +4,7 @@
     {% block menu_sys_header %}
         <h1 class='menu_sys_h1'>{{ "house_list"|trans({}, "house") }}</h1>
     {% endblock %}
-
+    
     <br class = 'clr'/>
     {{ wo_render_breadcrumbs() }}
 
@@ -32,9 +32,10 @@
                     <td class = 'center'>{{ entity.number }}</td>
                     <td class = ''>
                         <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('house_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>
-                        <a class = 'menu_sys_delete delete_object'
+                        <a class = 'menu_sys_delete delete_object_VErrTest'
                                data-link="#tr_menu_sys_{{entity.id}}" data-form="#menu_sys_delete_{{entity.id}}">
                     {{ "delete"|trans }}</a>
+                        <div id="VErrTest" hidden="hidden">{{ "the object is not empty"|trans({}, "house") }}</div>
                     <form id="menu_sys_delete_{{entity.id}}" style = 'display:inline-block'  action="{{ path('house_delete', { 'id': entity.id }) }}" method="post">
                         {{ form_widget( delete_form[entity.id]) }}
                     </form>

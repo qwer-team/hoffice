@@ -27,8 +27,21 @@ class ServiceController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('HOfficeAdminBundle:Service\Service')->findAll();
-            
+        $entities = $em->getRepository('HOfficeAdminBundle:Service\Service')
+                       ->findAll();
+        /*
+        $repo = $em->getRepository('Gedmo\Loggable\Entity\LogEntry');
+        $log = $repo->getLogEntries($entities[0]);
+        
+        
+        echo "<pre>";
+        foreach($log as $l)
+        {
+            print_r($l->getData());
+        }
+        echo "</pre>";
+        */
+        
         return array(
             'entities' => $entities,
         );

@@ -90,15 +90,7 @@ class ApartmentController extends Controller
     */
     
     public function newAction($parent_id)
-    {
-//        $entity = new Apartment();
-//        $form   = $this->createForm(new ApartmentType(), $entity);
-//
-//        return array(
-//            'entity' => $entity,
-//            'form'   => $form->createView(),
-//        );
-        
+    {        
         $em = $this->getDoctrine()->getManager();
         $entity = new Apartment();
         //$languages = $this->getLanguages();
@@ -163,12 +155,10 @@ class ApartmentController extends Controller
         }
 
         $editForm = $this->createForm(new ApartmentType(), $entity);
-        $deleteForm = $this->createDeleteForm($id);
 
         return array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
         );
     }
 
@@ -225,9 +215,14 @@ class ApartmentController extends Controller
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find House\Apartment entity.');
             }
-
             $em->remove($entity);
-            $em->flush();
+            try{
+              $em->flush();
+            }
+            catch(\Exception $e)
+            {
+                throw $this->createNotFoundException('ERROR');
+            }
         }
 
         return $this->redirect($this->generateUrl('apartment'));
