@@ -25,6 +25,7 @@ class InvoiceType extends AbstractType
             ->add('ucor')
             ->add('dtcor')
             ->add('pdtype')
+            ->add('contract')
         ;
     }
 

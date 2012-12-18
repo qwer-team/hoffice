@@ -25,9 +25,6 @@
     </div>
     <div class = 'menu_sys_upper_form fl'>
         <div class = 'fl'>
-            {{ form_row( edit_form.parent_id ) }}
-        </div>
-        <div class = 'fl'>
             {{ form_row( edit_form.kod ) }}
         </div>
         <div class = 'fl'>
@@ -41,12 +38,8 @@
         </div>
         <br class="clr"/>       
         <div style="position: relative; top: 5px; right: 10px; height: 10px;"> </div>
-        <div class = 'fl'>
-            {{ form_row( edit_form.user ) }}
-        </div>
-        <div class = 'fl'>
-            {{ form_row( edit_form.apartment ) }}
-        </div>
+        User: {{ user.fio }}
+        Apartment: {{ apartment.name }}
     </div>
         
     <br class = 'clr' />

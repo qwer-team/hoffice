@@ -9,6 +9,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use HOffice\AdminBundle\Entity\Contract\Contract;
 use HOffice\AdminBundle\Form\Contract\ContractType;
+use HOffice\AdminBundle\Form\Contract\ContractCreateType;
+use HOffice\AdminBundle\Form\Contract\ContractNewType;
 use HOffice\AdminBundle\Form\Contract\SearchContractType;
 use Itc\AdminBundle\Tools\TranslitGenerator;
 use Symfony\Component\Locale\Locale;
@@ -36,16 +38,15 @@ class ContractController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $locale =  LanguageHelper::getLocale();
-//          $entities = $em->getRepository('HOfficeAdminBundle:Contract\Contract')->findAll();
         
         $repo = $em->getRepository('HOfficeAdminBundle:Contract\Contract');
         
-        $qb = $repo->createQueryBuilder('M')
-                        ->select('M, U')
-                        ->innerJoin('M.user', 'U')
-                        ->innerJoin('M.apartment', 'A')
-                        ->orderBy('M.kod', 'ASC');    
-        
+        $qb = $repo->createQueryBuilder('C')
+                        ->select('C, U, A')
+                        ->innerJoin('C.user', 'U')
+                        ->innerJoin('C.apartment', 'A')
+                        ->orderBy('C.kod', 'ASC');    
+     
         $paginator = $this->get('knp_paginator');
         $entities = $paginator->paginate(
             $qb,
@@ -180,12 +181,14 @@ class ContractController extends Controller
      */
     public function newAction($parent_id)
     {
+        $em = $this->getDoctrine()->getManager();                
         $languages  = LanguageHelper::getLanguages();
         $locale =  LanguageHelper::getLocale();
         $entity = new Contract();
         
         $entity->setKod($this->getKodeForContract($parent_id));
-        $form   = $this->createForm(new ContractType(), $entity);
+        $form   = $this->createForm(new ContractNewType($em), $entity
+                    );
 
         return array(
             'entity' => $entity,
@@ -205,15 +208,27 @@ class ContractController extends Controller
     public function createAction(Request $request)
     {
         $entity  = new Contract();
+        $em = $this->getDoctrine()->getManager();                        
         $languages  = LanguageHelper::getLanguages();
         $locale =  LanguageHelper::getLocale();
-
-        $form = $this->createForm(new ContractType(), $entity);
+        $postData = $request->request->get('itc_documentsbundle_contract_contracttype');
+        //print_r($postData);echo "<br />";
+        $apartment = $em->getRepository('HOfficeAdminBundle:House\Apartment')
+                      ->find($postData['apartment_id']);
+        $form = $this->createForm(new ContractCreateType($em, $apartment), 
+                                    $entity );
+        $user = $em->getRepository('ItcAdminBundle:User')
+                      ->find($postData['user_id']);
         $form->bind($request);
         $data = $form->getData();
-        print_r($data);
+        //print_r($data);
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            
+            $entity->setUser($user);
+  
+            $entity->setApartment($apartment);
+            
             $em->persist($entity);
             $em->flush();
 
@@ -225,6 +240,7 @@ class ContractController extends Controller
             'form'   => $form->createView(),
             'locale' => $locale,
             'languages' => $languages,
+            'user'      => $user,
         );
     }
 
@@ -246,8 +262,11 @@ class ContractController extends Controller
             throw $this->createNotFoundException('Unable to find Contract\Contract entity.');
         }
 
-        $editForm = $this->createForm(new ContractType(), $entity);
+        $editForm = $this->createForm(new ContractType($em), $entity );
         $deleteForm = $this->createDeleteForm($id);
+
+        $user = $entity->getUser();
+        $apartment = $entity->getApartment();
 
         return array(
             'entity'      => $entity,
@@ -255,6 +274,8 @@ class ContractController extends Controller
             'delete_form' => $deleteForm->createView(),
             'locale' => $locale,
             'languages' => $languages,
+            'user' => $user,
+            'apartment' => $apartment
         );
     }
 
@@ -268,6 +289,8 @@ class ContractController extends Controller
     public function updateAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
 
         $entity = $em->getRepository('HOfficeAdminBundle:Contract\Contract')->find($id);
 
@@ -276,7 +299,7 @@ class ContractController extends Controller
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new ContractType(), $entity);
+        $editForm = $this->createForm(new ContractType($em), $entity);
         $editForm->bind($request);
 
         if ($editForm->isValid()) {
@@ -285,11 +308,17 @@ class ContractController extends Controller
 
             return $this->redirect($this->generateUrl('contract_edit', array('id' => $id)));
         }
+        $user = $entity->getUser();
+        $apartment = $entity->getApartment();
 
         return array(
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
+            'user' => $user,
+            'apartment' => $apartment
         );
     }
 
@@ -329,20 +358,10 @@ class ContractController extends Controller
     
     private function getKodeForContract($parent_id)
     {
-        return 1;
         $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em->getRepository('HOfficeAdminBundle:Contract\Contract')
                                         ->createQueryBuilder('M')
                                         ->select('max(coalesce(M.kod,0)) + 1 kod');
-        if(null === $parent_id)
-        {
-            $queryBuilder->where("M.parent is NULL");
-        }
-        else
-        {
-            $queryBuilder->where("M.parent = :parent")
-                         ->setParameter('parent', $parent_id);
-        }
         
         $kod = $queryBuilder->getQuery()->getSingleScalarResult();
         return is_null($kod) ? 1 : $kod ;

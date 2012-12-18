@@ -1,4 +1,76 @@
+
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block search %}
+
+{% endblock %}
+{% block javascript %}
+    {{ parent() }}
+    {#{{ form_javascript(search_form) }}#}
+{% endblock %}
+{% block css %}
+    {{ parent() }}
+{#    {{ form_stylesheet(search_form) }}#}
+{% endblock %}
+{% block menu %}
+    {{ parent() }}
+{% endblock%}
+
+{% block body %}
+
 <h1>Invoice\Invoice list</h1>
+     {% block header %}
+        {{ wo_render_breadcrumbs() }}
+        <div class = 'menu_sys_main_conteiner'>
+        <div class="menu_sys_upper_form">
+            <form action="{{ path('invoice_search') }}" method="post" {{ form_enctype(search_form) }}>
+                <div class = 'fl'>
+                    {{ form_row(search_form['id']) }}         
+                </div>
+                <div class = 'fl'>
+                    {{ form_row(search_form['serial_number']) }}         
+                </div>
+                <div class = 'fl'>
+                    {{ form_row(search_form['user']) }}         
+                </div>
+                <div class = 'fl'>
+                    {{ form_row(search_form['house']) }}         
+                </div>
+                {% set class %}
+                    {% if search_form.house.vars.value is empty %}hidden{% endif %}
+                {% endset %}               
+                <div class = 'fl {{ class }}'>
+                    {{ form_row(search_form['apartment_id']) }}         
+                </div>                             
+                <br class="clr">
+                <div style = 'position: relative; top: 5px; right: 10px; height: 10px;'>    
+                </div>
+                <div class = 'fl' >
+                    {{ form_row(search_form['month']) }}         
+                </div>                                   
+                <div class = 'fl' >
+                    {{ form_row(search_form['year']) }}         
+                </div>                                   
+                <br class="clr">
+                {{ form_widget(search_form) }}
+                <div style = 'position: relative; top: 5px; right: 10px; height: 10px;'>    
+                </div>
+                <div class = 'fl'>
+                    <button type="submit">{{ "find"|trans }}</button>
+                </div>
+            </form>
+        </div>
+        <br class="clr">
+        <hr />
+        {% set route = app.request.get('_route') %}
+
+        {% if route != path('invoice_search') %}
+            {% include 'ItcAdminBundle::navigator.html.twig' with {'route': 'invoice'} %}
+        {% endif %}
+
+        {% block navigation %}    
+            {% include 'ItcAdminBundle::addnew.html.twig' with {'route': 'invoice'} %}
+        {% endblock %}    
+    {% endblock %}
 
 <table class="records_list">
     <thead>
@@ -50,12 +122,40 @@
         </tr>
     {% endfor %}
     </tbody>
+    {% if total %}
+    <tfoot>
+        <tr>
+            <th>Total(Id): {{entities|length }}</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>{{ total.summa1 }}</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+    {% endif %}
 </table>
 
-<ul>
-    <li>
-        <a href="{{ path('invoice_new') }}">
-            Create a new entry
-        </a>
-    </li>
-</ul>
+    {% block bottom %}
+
+    {{ block("navigation") }}
+        {% set route = app.request.get('_route') %}
+        {% if route != path('menu_search') %}
+        <div class="navigation" class = 'float_left'>
+            {{ entities.render() | raw }}
+        </div>
+
+        </div>
+        {% endif %}
+    {% endblock %}
+                
+{% endblock %}
