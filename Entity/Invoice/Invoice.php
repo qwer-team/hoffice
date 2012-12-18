@@ -15,5 +15,18 @@ use Itc\DocumentsBundle\Entity\Pd\Pd;
  */
 class Invoice extends Pd{
     
+    /**
+     * @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", inversedBy="invoice")
+     */
+    private $contract;
+    
+    public function getContract() {
+        return $this->contract;
+    }
+
+    public function setContract($contract) {
+        $this->contract = $contract;
+    }
 
 }

@@ -9,6 +9,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use HOffice\AdminBundle\Entity\Invoice\Invoice;
 use HOffice\AdminBundle\Form\Invoice\InvoiceType;
+use Symfony\Component\Locale\Locale;
+use Itc\AdminBundle\Tools\LanguageHelper;
+use Itc\AdminBundle\ItcAdminBundle;
 
 /**
  * Invoice\Invoice controller.
@@ -66,12 +69,20 @@ class InvoiceController extends Controller
      */
     public function newAction()
     {
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
+        $context = ItcAdminBundle::getContainer();
         $entity = new Invoice();
         $form   = $this->createForm(new InvoiceType(), $entity);
-
+        $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
+        $date = date("d/m/Y");
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
+            'date' => $date,
+            'user' => $usr,
         );
     }
 
@@ -80,7 +91,7 @@ class InvoiceController extends Controller
      *
      * @Route("/create", name="invoice_create")
      * @Method("POST")
-     * @Template("HOfficeAdminBundle:Invoice\Invoice:new.html.twig")
+     * @Template("HOfficeAdminBundle:Invoice\Invoice:edit.html.twig")
      */
     public function createAction(Request $request)
     {
@@ -88,17 +99,39 @@ class InvoiceController extends Controller
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid()) 
+        {
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
+            $entity->setStatus(1);
+            $entity->setPdtypeId(1);
+            $entity->setOa1(0);
+            $entity->setOa2(0);
+            $entity->setSumma1(0);
+            $entity->setSumma2(0);
+            $entity->setSumma3(0);
             $em->flush();
-
-            return $this->redirect($this->generateUrl('invoice_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
+        }else{
+            echo $form->getErrorsAsString();
         }
-
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
+        $context = ItcAdminBundle::getContainer();
+        $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
+        $date = date("d/m/Y");
+        
+        
+        
+        
+        
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
+            'date' => $date,
+            'user' => $usr,
         );
     }
 

@@ -29,7 +29,7 @@ class ServiceController extends Controller
 
         $entities = $em->getRepository('HOfficeAdminBundle:Service\Service')
                        ->findAll();
-        /*
+        
         $repo = $em->getRepository('Gedmo\Loggable\Entity\LogEntry');
         $log = $repo->getLogEntries($entities[0]);
         
@@ -40,7 +40,7 @@ class ServiceController extends Controller
             print_r($l->getData());
         }
         echo "</pre>";
-        */
+        
         
         return array(
             'entities' => $entities,
