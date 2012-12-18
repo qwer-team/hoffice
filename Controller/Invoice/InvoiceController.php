@@ -13,6 +13,7 @@ use HOffice\AdminBundle\Form\Invoice\SearchInvoiceType;
 use Itc\AdminBundle\Tools\TranslitGenerator;
 use Symfony\Component\Locale\Locale;
 use Itc\AdminBundle\Tools\LanguageHelper;
+use Itc\AdminBundle\ItcAdminBundle;
 
 /**
  * Invoice\Invoice controller.

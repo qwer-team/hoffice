@@ -107,15 +107,6 @@ class Contract extends TranslatableEntity
      */
     protected $invoice;
 
-    /**
-     * @ORM\OneToMany(
-     *     targetEntity="HOffice\AdminBundle\Entity\Invoice\Invoice",
-     *     mappedBy="contract",
-     *     cascade={"persist"}
-     * )
-     */
-    protected $invoice;
-
     function __toString(){
         return is_null( $this->title ) ? "" : $this->title ;
     }
@@ -319,13 +310,6 @@ class Contract extends TranslatableEntity
     {
         $this->apartment = $apartment;
         return $this;
-    }
-    public function getInvoice() {
-        return $this->invoice;
-    }
-
-    public function setInvoice($invoice) {
-        $this->invoice = $invoice;
     }
 
 
