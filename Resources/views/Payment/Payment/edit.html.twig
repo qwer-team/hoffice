@@ -1,0 +1,45 @@
+{% extends 'ItcAdminBundle::layout.html.twig' %}
+{% block menu %}{% endblock %}
+
+{% block javascript %}
+
+    {{ parent() }}
+    {% include 'ItcAdminBundle:Menu:select2.js.twig' %}
+    {{ form_javascript( edit_form ) }}
+{% endblock%}
+{% block css %}
+
+    {{ parent() }}
+    {{ form_stylesheet( edit_form ) }}
+{% endblock %}
+
+{% block body %}
+
+    {{ "fio" | trans }}: {{ user.fio }}
+    {{ "flat" | trans }}: {{ apartment.name }}
+    {{ "S" | trans }}: {{ apartment.sall }} / {{ apartment.slive }} / {{ apartment.sbalcony }}
+    {{ user.fio }}
+    <h1>Payment\Payment edit</h1>
+
+    <form style = 'display:inline-block' action="{{ path('payment_approved', { 'id': entity.id }) }}" method="post">
+        {{ form_widget( approved_form ) }}
+        <p>
+            <button type="submit">{{ 'approved' | trans }}</button>
+        </p>
+    </form>
+
+    <form style = 'display:inline-block' action="{{ path('payment_reversal', { 'id': entity.id }) }}" method="post">
+        {{ form_widget( reversal_form ) }}
+        <p>
+            <button type="submit">{{ 'rolled' | trans }}</button>
+        </p>
+    </form>
+
+    <form action="{{ path('payment_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }}>
+        {{ form_widget( edit_form ) }}
+        <p>
+            <button type="submit">Edit</button>
+        </p>
+    </form>
+
+{% endblock %}

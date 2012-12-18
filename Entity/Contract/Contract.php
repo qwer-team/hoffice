@@ -57,21 +57,21 @@ class Contract extends TranslatableEntity
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="user_id", type="integer", nullable=true)
+     * @Assert\NotNull()
+     * @ORM\Column(name="user_id", type="integer")
      */
     private $user_id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Itc\AdminBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true )
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
     
     /**
      * @var integer
-     *
-     * @ORM\Column(name="apartment_id", type="integer", nullable=true )
+     * @Assert\NotNull()
+     * @ORM\Column(name="apartment_id", type="integer")
      */
     private $apartment_id;
 
@@ -107,48 +107,31 @@ class Contract extends TranslatableEntity
      */
     protected $invoice;
 
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="HOffice\AdminBundle\Entity\Invoice\Invoice",
+     *     mappedBy="contract",
+     *     cascade={"persist"}
+     * )
+     */
+    protected $invoice;
+
     function __toString(){
         return is_null( $this->title ) ? "" : $this->title ;
     }
 
     public function __construct() {
-        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->translations = new \Doctrine\Common\Collections\ArrayCollection();        
-    }
-    /**
-     * Set parent
-     *
-     * @param HOffice\AdminBundle\Entity\Contract\Contract $parent
-     * @return Contract
-     */
-    public function setParent(\HOffice\AdminBundle\Entity\Contract\Contract $parent = null)
-    {
-        $this->parent = $parent;
-    
-        return $this;
+        parent::__construct();
+        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();        
     }
 
-    /**
-     * Get parent
-     *
-     * @return HOffice\AdminBundle\Entity\Contract\Contract
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-    public function getChildren()
-    {
-        return $this->children;
+    public function getInvoice() {
+        return $this->invoice;
     }
 
-    /**
-     * Set parent_id
-     *
-     * @param integer $parentId
-     * @return Menu
-     */
-
+    public function setInvoice($invoice) {
+        $this->invoice = $invoice;
+    }    
     /**
      * Get id
      *

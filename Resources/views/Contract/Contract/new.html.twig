@@ -40,6 +40,15 @@
         <div style="position: relative; top: 5px; right: 10px; height: 10px;"> 
         </div>
         <div class = 'fl'>
+            {{ form_errors( form) }}
+            {{ form_widget( form.user_id ) }}
+            User <input class='entity_search w250px' 
+                    data-link=".search_user_id"
+                    data-type-link="input"
+                    data-route="ajax_search_user" 
+                    value="{% if user is defined %}{{ user }}{% endif %}"/>
+        </div>
+        <div class = 'fl'>
             <input type="hidden" class='search_house_id' />
             House <input type="text" class="entity_search w100pr" 
                     data-link=".search_house_id"
@@ -51,10 +60,10 @@
                     data-route="ajax_search_apartment" />
         </div>
         <div class = 'fl'>
-            {{ form_row( form.serial_number ) }}
+            {{ form_row( form.apartment_id ) }}
         </div>
         <div class = 'fl'>
-            {{ form_row( form.user ) }}
+            {{ form_row( form.serial_number ) }}
         </div>
     </div>
         

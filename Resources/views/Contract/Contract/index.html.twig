@@ -36,11 +36,12 @@
                 </div>
                 <div class = 'fl'>
                     {{ form_row(search_form['house']) }}         
-                </div>                                   
-                    {% set class %}
-                        {% if search_form['apartment_id'] is null %}hidden{% endif %}
-                    {% endset %}{{ class }}
-                <div class = 'fl {{ class }}'>
+                </div>    {#                               
+                {% set class %}
+                    {% if form_row(search_form['apartment_id']) is null %}hidden{% endif %}
+                {% endset %}
+                {{ class }}#}
+                <div class = 'fl {#{ class }#}'>
                     {{ form_row(search_form['apartment_id']) }}         
                 </div>                                   
               {{ form_widget(search_form) }}
