@@ -133,7 +133,7 @@ class PaymentController extends BaseController {
     }
     
     function getSearchQuery( $select, $data ){
-        
+
         $this->resetParam();
 
         $qb = $this->getQbAllJoins( $select );
