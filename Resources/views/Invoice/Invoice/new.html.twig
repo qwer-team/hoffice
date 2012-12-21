@@ -30,7 +30,7 @@
             {{ form_row( form.N  ) }}
         </div>
         <div class = 'fl'>
-            {{ form_row( form.contract ) }}
+            {{ form_row( form.contract_id ) }}
             <input type="hidden" class='loadContractData'
                     data-link=".loadContractData"
                     data-route="ajax_data_from_contract" />  
@@ -179,23 +179,3 @@
 </div>
 
 {% endblock %}    
-
-
-
-{#
-<h1>Invoice\Invoice creation</h1>
-
-<form action="{{ path('invoice_create') }}" method="post" {{ form_enctype(form) }}>
-    {{ form_widget(form) }}
-    <p>
-        <button type="submit">Create</button>
-    </p>
-</form>
-
-<ul class="record_actions">
-    <li>
-        <a href="{{ path('invoice') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>#}

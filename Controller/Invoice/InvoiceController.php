@@ -14,7 +14,8 @@ use Itc\AdminBundle\Tools\TranslitGenerator;
 use Symfony\Component\Locale\Locale;
 use Itc\AdminBundle\Tools\LanguageHelper;
 use Itc\AdminBundle\ItcAdminBundle;
-
+use HOffice\AdminBundle\Form\Invoice\EditInvoiceType;
+use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
 /**
  * Invoice\Invoice controller.
  *
@@ -240,39 +241,37 @@ class InvoiceController extends Controller
      *
      * @Route("/create", name="invoice_create")
      * @Method("POST")
-     * @Template("HOfficeAdminBundle:Invoice\Invoice:edit.html.twig")
+     * @Template("HOfficeAdminBundle:Invoice\Invoice:new.html.twig")
      */
     public function createAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
         $entity  = new Invoice();
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
-
+        $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
+                       ->find($entity->getContractId());
+        $entity->setContract($contract);
+        $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
+        $entity->setPdtype($pdtype);
+        $entity->setSumma1(0);
+        $entity->setSumma2(0);
+        
+        
         if ($form->isValid()) 
         {
-            $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $entity->setStatus(1);
-            $entity->setPdtypeId(1);
-            $entity->setOa1(0);
-            $entity->setOa2(0);
-            $entity->setSumma1(0);
-            $entity->setSumma2(0);
-            $entity->setSumma3(0);
             $em->flush();
             return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
-            echo $form->getErrorsAsString();
+            print_r($form->getErrors());
         }
+        
         $languages  = LanguageHelper::getLanguages();
         $locale =  LanguageHelper::getLocale();
         $context = ItcAdminBundle::getContainer();
         $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
         $date = date("d/m/Y");
-        
-        
-        
-        
         
         return array(
             'entity' => $entity,
@@ -295,18 +294,36 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
-
+   
+       /* $entity2 = $em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
+                     ->createQueryBuilder( 'I' )
+                     ->select( 'I, C' )
+                ->innerJoin('I.contract', 'C')
+//                ->innerJoin('C.contracts_services', 'CS')
+//                ->innerJoin('CS.service', 'S')
+                ->where( "I.id  = :id" )
+                ->setParameter('id', $id)
+                ->getQuery()
+                ->execute();*/
+        
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
-
-        $editForm = $this->createForm(new InvoiceType(), $entity);
-        $deleteForm = $this->createDeleteForm($id);
+       /* if (!$entity2) {
+            throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
+        }*/
+        
+        $editForm = $this->createForm(new EditInvoiceType(),$entity);
+       /* $editForm2 = $this->createForm(new MetersEditInvoiceType(),$entity2);*/
+//      $editForm = $this->createForm(new InvoiceType(), $entity);
+//      $deleteForm = $this->createDeleteForm($id);
 
         return array(
             'entity'      => $entity,
+           /* 'entity2'      => $entity2,*/
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+           /* 'meters_edit_form'   => $editForm2->createView(),*/
+            //'delete_form' => $deleteForm->createView(),
         );
     }
 

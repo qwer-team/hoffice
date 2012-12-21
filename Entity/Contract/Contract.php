@@ -106,14 +106,32 @@ class Contract extends TranslatableEntity
      * )
      */
     protected $invoice;
-
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Service\Service", 
+     * inversedBy="contracts")
+     * @ORM\JoinTable(name="contracts_services")
+     */
+    protected $servises;
+    
+    public function getservises()
+    {
+        return $this->servises;
+    }
+    public function  setservises($servise)
+    {
+        $this->servises[] = $servise;
+        return $this;
+    }
+    
     function __toString(){
         return is_null( $this->title ) ? "" : $this->title ;
     }
 
     public function __construct() {
         parent::__construct();
-        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();        
+        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();   
+        $this->servises = new \Doctrine\Common\Collections\ArrayCollection();     
     }
 
     public function getInvoice() {

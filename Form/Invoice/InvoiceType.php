@@ -19,9 +19,8 @@ class InvoiceType extends AbstractType
             ->add('N')
             //->add('date')
             //->add('status', null, $disable )
-            ->add('contract', 'integer',
-                    array('required'=>NULL, 
-                        'attr' => array(
+            ->add('contract_id', 'integer',
+                    array('attr' => array(
                             'class' => 'entity_search',
                             'data-link' => ".loadContractData",
                             'data-type-link' => "input",

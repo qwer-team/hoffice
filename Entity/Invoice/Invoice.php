@@ -16,17 +16,14 @@ use HOffice\AdminBundle\Entity\Contract\Contract;
  * @ORM\HasLifecycleCallbacks
  */
 class Invoice extends Pd{
-    
     /**
      * @var integer
      * @Assert\NotNull()
-     * @ORM\Column(name="contract_id", type="integer")
      */
     private $contract_id;
 
     /**
-     * @Assert\NotNull()
-     * @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="oa1", referencedColumnName="id")
      * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", inversedBy="invoice")
      */
     private $contract;
@@ -46,5 +43,9 @@ class Invoice extends Pd{
     public function setContractId($contract_id) {
         $this->contract_id = $contract_id;
     }
-
+    /** @ORM\PostLoad */
+    public function resetContactId()
+    {
+        $this->contract_id = $this->getContractId();
+    }
 }
