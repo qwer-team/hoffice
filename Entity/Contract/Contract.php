@@ -97,7 +97,7 @@ class Contract extends TranslatableEntity
     * )
     */
     protected $translations;
-
+        
     /**
      * @ORM\OneToMany(
      *     targetEntity="HOffice\AdminBundle\Entity\Invoice\Invoice",
@@ -106,14 +106,32 @@ class Contract extends TranslatableEntity
      * )
      */
     protected $invoice;
-
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Service\Service", 
+     * inversedBy="contracts")
+     * @ORM\JoinTable(name="contracts_services")
+     */
+    protected $services;
+    
+    public function getservices()
+    {
+        return $this->services;
+    }
+    public function setservices($servise)
+    {
+        $this->services[] = $servise;
+        return $this;
+    }
+    
     function __toString(){
         return is_null( $this->title ) ? "" : $this->title ;
     }
 
     public function __construct() {
         parent::__construct();
-        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();        
+        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();   
+        $this->services = new \Doctrine\Common\Collections\ArrayCollection();     
     }
 
     public function getInvoice() {
@@ -311,6 +329,8 @@ class Contract extends TranslatableEntity
         $this->apartment = $apartment;
         return $this;
     }
+
+
     
         
 }

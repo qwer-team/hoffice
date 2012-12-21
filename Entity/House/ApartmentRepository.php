@@ -19,14 +19,4 @@ class ApartmentRepository extends EntityRepository
         $qb->orderBy('M.kod');
         return $qb;
     }
-//    
-//    public function checkFor($houseId){
-//        $qb = $this->_em->createQueryBuilder()
-//                        ->select("M")
-//                        ->from("HOfficeAdminBundle:House\Apartment", "M")
-//                        ->where('M.houseId = :houseId')
-//                        ->setParameter('houseId', $houseId); 
-//        
-//        return  $qb;           
-//    }
 }
