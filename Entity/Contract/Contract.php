@@ -112,15 +112,15 @@ class Contract extends TranslatableEntity
      * inversedBy="contracts")
      * @ORM\JoinTable(name="contracts_services")
      */
-    protected $servises;
+    protected $services;
     
-    public function getservises()
+    public function getservices()
     {
-        return $this->servises;
+        return $this->services;
     }
-    public function  setservises($servise)
+    public function setservices($servise)
     {
-        $this->servises[] = $servise;
+        $this->services[] = $servise;
         return $this;
     }
     
@@ -131,7 +131,7 @@ class Contract extends TranslatableEntity
     public function __construct() {
         parent::__construct();
         $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();   
-        $this->servises = new \Doctrine\Common\Collections\ArrayCollection();     
+        $this->services = new \Doctrine\Common\Collections\ArrayCollection();     
     }
 
     public function getInvoice() {

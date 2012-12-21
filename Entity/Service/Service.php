@@ -59,7 +59,7 @@ class Service
     private $unit;
 
    /**
-     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", mappedBy="servises")
+     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", mappedBy="serviсes")
      */
     private $contracts;
     

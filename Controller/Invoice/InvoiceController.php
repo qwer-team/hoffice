@@ -295,34 +295,34 @@ class InvoiceController extends Controller
 
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
    
-       /* $entity2 = $em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
+        $entity2 = $entity->getContract()->getServices();
+        /*$em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
                      ->createQueryBuilder( 'I' )
-                     ->select( 'I, C' )
+                     ->select( 'I, S' )
                 ->innerJoin('I.contract', 'C')
-//                ->innerJoin('C.contracts_services', 'CS')
-//                ->innerJoin('CS.service', 'S')
+                ->innerJoin('C.services', 'S')
                 ->where( "I.id  = :id" )
                 ->setParameter('id', $id)
                 ->getQuery()
-                ->execute();*/
-        
+                ->execute();
+        */
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
-       /* if (!$entity2) {
+        if (!$entity2) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
-        }*/
+        }
         
         $editForm = $this->createForm(new EditInvoiceType(),$entity);
-       /* $editForm2 = $this->createForm(new MetersEditInvoiceType(),$entity2);*/
+        $editForm2 = $this->createForm(new MetersEditInvoiceType(),$entity2);
 //      $editForm = $this->createForm(new InvoiceType(), $entity);
 //      $deleteForm = $this->createDeleteForm($id);
 
         return array(
             'entity'      => $entity,
-           /* 'entity2'      => $entity2,*/
+            'entity2'      => $entity2,
             'edit_form'   => $editForm->createView(),
-           /* 'meters_edit_form'   => $editForm2->createView(),*/
+            'meters_edit_form'   => $editForm2->createView(),
             //'delete_form' => $deleteForm->createView(),
         );
     }

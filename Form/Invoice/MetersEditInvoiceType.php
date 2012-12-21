@@ -19,13 +19,13 @@ class MetersEditInvoiceType  extends AbstractType
         $disable = array( 'disabled'=>'disabled' );
         $builder
          			 	 	 
-//            ->add('id')
-//            ->add('unit_id ')
-//            ->add('kod')
-//            ->add('name')
-//            ->add('price')
-//            ->add('price1');	 
-        ->add('id') 	->add('user_id') 	->add('apartment_id') 	->add('kod') 	->add('serial_number') 	->add('title') 	->add('registered') 	->add('sale');
+            ->add('id')
+            ->add('unit_id ')
+            ->add('kod')
+            ->add('name')
+            ->add('price')
+            ->add('price1');	 
+//        ->add('id') 	->add('user_id') 	->add('apartment_id') 	->add('kod') 	->add('serial_number') 	->add('title') 	->add('registered') 	->add('sale');
 //            ->add('N')
 //            ->add('date','date', $disable )
 //            ->add('status')
