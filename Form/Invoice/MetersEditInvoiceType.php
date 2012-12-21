@@ -20,7 +20,7 @@ class MetersEditInvoiceType  extends AbstractType
         $builder
          			 	 	 
             ->add('id')
-            ->add('unit_id ')
+            ->add('unit')
             ->add('kod')
             ->add('name')
             ->add('price')

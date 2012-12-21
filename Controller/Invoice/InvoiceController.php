@@ -294,8 +294,9 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
-   
-        $entity2 = $entity->getContract()->getServices();
+        $temp =$entity->getContract();
+        $entity2 = $temp->getServices();
+        //$entity2 = $temp->getServices();
         /*$em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
                      ->createQueryBuilder( 'I' )
                      ->select( 'I, S' )
@@ -314,7 +315,11 @@ class InvoiceController extends Controller
         }
         
         $editForm = $this->createForm(new EditInvoiceType(),$entity);
-        $editForm2 = $this->createForm(new MetersEditInvoiceType(),$entity2);
+        foreach( $entity2 as $serv ){
+            $editForm2 = $this->createForm(new MetersEditInvoiceType(), $serv );
+            $editForm2->createView();
+            $servForm[] = $editForm2;
+        }
 //      $editForm = $this->createForm(new InvoiceType(), $entity);
 //      $deleteForm = $this->createDeleteForm($id);
 
@@ -322,7 +327,7 @@ class InvoiceController extends Controller
             'entity'      => $entity,
             'entity2'      => $entity2,
             'edit_form'   => $editForm->createView(),
-            'meters_edit_form'   => $editForm2->createView(),
+            'meters_edit_form'   => $servForm,
             //'delete_form' => $deleteForm->createView(),
         );
     }

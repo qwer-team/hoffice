@@ -59,7 +59,7 @@ class Service
     private $unit;
 
    /**
-     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", mappedBy="serviсes")
+     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", mappedBy="services")
      */
     private $contracts;
     
@@ -74,7 +74,7 @@ class Service
      * @param Itc\AdminBundle\Entity\Contract\Contract $contracts
      * @return Keyword
      */
-    public function addContract(\Itc\AdminBundle\Entity\Contract\Contract $contracts)
+    public function addContracts(\Itc\AdminBundle\Entity\Contract\Contract $contracts)
     {
         $this->contracts[] = $contracts;
     
@@ -86,7 +86,7 @@ class Service
      *
      * @param Itc\AdminBundle\Entity\Contract\Contract $contracts
      */
-    public function removeContract(\Itc\AdminBundle\Entity\Contract\Contract $contracts)
+    public function removeContracts(\Itc\AdminBundle\Entity\Contract\Contract $contracts)
     {
         $this->contracts->removeElement($contracts);
     }
@@ -96,7 +96,7 @@ class Service
      *
      * @return Doctrine\Common\Collections\Collection 
      */
-    public function getcontracts()
+    public function getContracts()
     {
         return $this->contracts;
     }

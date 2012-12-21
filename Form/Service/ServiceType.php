@@ -15,7 +15,7 @@ class ServiceType extends AbstractType
             ->add('name')
             ->add('price')
             ->add('price1')
-            ->add('unit')
+            //->add('unit')
         ;
     }
 
