@@ -1,0 +1,29 @@
+<h1>Reversal\Reversal creation</h1>
+
+<form action="{{ path('reversal_create') }}" method="post" {{ form_enctype(form) }}>
+
+    {% set formPdl %}
+
+        {% for pdline in form.pdlines %}
+                {{ form_row(pdline.oa1) }}
+                {{ form_row(pdline.N) }}
+                {{ form_row(pdline.summa1) }}
+        {% endfor %}
+
+    {% endset %}
+
+    {{ form_widget(form) }}
+
+    {{ formPdl }}
+    <p>
+        <button type="submit">Create</button>
+    </p>
+</form>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('reversal') }}">
+            Back to the list
+        </a>
+    </li>
+</ul>

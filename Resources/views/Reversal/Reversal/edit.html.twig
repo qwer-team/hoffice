@@ -1,0 +1,38 @@
+<h1>Reversal\Reversal edit</h1>
+
+<form action="{{ path('reversal_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }}>
+    
+
+    {% set formPdl %}
+
+        {% for pdline in edit_form.pdlines %}
+
+                {{ form_row( pdline.oa1 ) }}
+                {{ form_row( pdline.N ) }}
+                {{ form_row( pdline.summa1 ) }}
+
+        {% endfor %}
+
+    {% endset %}
+
+    {{ form_widget(edit_form) }}
+    {{ formPdl }}
+
+    <p>
+        <button type="submit">Edit</button>
+    </p>
+</form>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('reversal') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <form action="{{ path('reversal_delete', { 'id': entity.id }) }}" method="post">
+            {{ form_widget(delete_form) }}
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+</ul>

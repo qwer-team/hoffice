@@ -13,7 +13,7 @@ use HOffice\AdminBundle\Entity\Payment\Payment;
 use HOffice\AdminBundle\Form\Payment\PaymentType;
 use HOffice\AdminBundle\Form\Payment\SearchPaymentType;
 
-use Itc\AdminBundle\Controller\BaseController;
+use Main\SiteBundle\Helper\ControllerHelper;
 
 use Itc\AdminBundle\Tools\LanguageHelper;
 /**
@@ -21,7 +21,7 @@ use Itc\AdminBundle\Tools\LanguageHelper;
  *
  * @Route("/payment")
  */
-class PaymentController extends BaseController {
+class PaymentController extends ControllerHelper {
     
     private $payment = "HOfficeAdminBundle:Payment\Payment";
 
@@ -36,6 +36,11 @@ class PaymentController extends BaseController {
      * @Template()
      */
     public function indexAction( $coulonpage = 10, $page ) {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $rest = $em->getRepository('Itc\DocumentsBundle\Entity\Pd\Rest')
+                   ->find(1, array( "l1" => 1 ), "2012", "1:10" );
 
         $select = "SUM( P.summa1 ) AS summa1, 
                    SUM( P.summa2 ) AS summa2, 
@@ -64,6 +69,18 @@ class PaymentController extends BaseController {
             'coulonpage'  => $coulonpage,
 
         );
+
+    }
+
+    /**
+     * @Route(
+     *      "/", name="payment_index"
+     * )
+     * @Template()
+     */
+    public function index1Action() {
+
+        return $this->redirect( $this->generateUrl( 'payment', array() ) );
 
     }
 

@@ -111,6 +111,7 @@
                             {{ form_rest(delete_form[entity.id]) }}
                         </form>  
                         <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('payment_edit', { 'id': entity.id }) }}">{{ "edit"|trans }}</a>
+                        <a class = 'menu_sys_edit new_window' target= '_blank' href="{{ path('trans', { 'pdid': entity.id }) }}">{{ "transaction"|trans }}</a>
                     </td>
                 </tr>
             {% endfor %}
