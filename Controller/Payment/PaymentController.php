@@ -83,7 +83,7 @@ class PaymentController extends BaseController {
 
     }
 
-        /**
+    /**
      * @Route("/{coulonpage}/search", name="payment_search",
      * requirements={"coulonpage" = "\d+"}, 
      * defaults={"coulonpage" = "100"})
@@ -207,6 +207,10 @@ class PaymentController extends BaseController {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $securityContext = $this->container->get('security.context');
+            $user= $securityContext->getToken()->getUser();
+//            $entity->set $user->getId();
+
             $em->persist($entity);
             $em->flush();
 
@@ -280,7 +284,22 @@ class PaymentController extends BaseController {
      * @Template("HOfficeAdminBundle:Payment\Payment:edit.html.twig")
      */
     public function paymentApproved( Request $request, $id ){
-
+        
+        $em = $this->getDoctrine()->getManager();
+        $rArray = array( "id" => $id );
+        $entity = $em->getRepository( $this->payment )
+                ->createQueryBuilder('P')
+                ->select('P, I')
+                ->innerJoin('P.invoice', 'I')
+                ->where("P.id = :id")
+                ->setParameter("id", $id)
+                ->getQuery()
+                ->getOneOrNullResult();
+        
+        $invoice_status = $entity->getInvoice()->getStatus();
+        if ($invoice_status == 1)
+            return $this->redirect( $this->generateUrl( 'payment_edit', $rArray ) );
+        
         return $this->paymentChangeStatus( $request, $id, 2 );
     }
     /**

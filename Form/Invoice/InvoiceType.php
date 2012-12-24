@@ -11,7 +11,7 @@ class InvoiceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('pdtype_id')
+//            ->add('pdtype_id')
             ->add('N')
             ->add('date')
             ->add('status')

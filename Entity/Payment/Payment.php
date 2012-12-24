@@ -4,6 +4,10 @@ namespace HOffice\AdminBundle\Entity\Payment;
 
 use Doctrine\ORM\Mapping as ORM;
 use \Itc\DocumentsBundle\Entity\Pd\Pd;
+use Symfony\Component\EventDispatcher\Event;
+use \HOffice\AdminBundle\HOfficeEvents;
+use \HOffice\AdminBundle\Event\PaymentEvent;
+
 
 /**
  * Payment
@@ -34,7 +38,25 @@ class Payment extends Pd {
      * )
      */
     private $contract;
-
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="invoice_id", type="integer")
+     */
+    private $invoice_id;
+    /**
+     * @ORM\ManyToOne
+     * (
+     *      targetEntity="HOffice\AdminBundle\Entity\Invoice\Invoice",
+     *      inversedBy="payments"
+     * )
+     * @ORM\JoinColumn
+     * (
+     *      name="invoice_id", 
+     *      referencedColumnName="id"
+     * )
+     */
+    private $invoice;   
     /**
      * Get id
      *
@@ -89,6 +111,33 @@ class Payment extends Pd {
     public function getContractId()
     {
         return $this->contract_id;
+    }
+    
+    public function setInvoice($invoice)
+    {
+        $this->invoice = $invoice;
+    
+        return $this;
+    }
+
+    /**
+     * Get menu
+     *
+     * @return string 
+     */
+    public function getInvoice()
+    {
+        return $this->invoice;
+    }
+    /** @ORM\PostUpdate() */
+    public function createTransaction(){
+        
+        $container = \Itc\AdminBundle\ItcAdminBundle::getContainer();
+        $dispatcher = $container->get("event_dispatcher");
+        
+        $event = new PaymentEvent($this);
+        $dispatcher->dispatch("lala.fafa", $event);
+        
     }
 
 }

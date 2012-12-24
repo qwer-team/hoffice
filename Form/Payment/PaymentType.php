@@ -24,7 +24,8 @@ class PaymentType extends AbstractType
 //            ->add('ucor')
 //            ->add('dtcor', 'genemu_jquerydate')
             ->add('contract')
-//            ->add('pdtype')
+            ->add('invoice')
+            ->add('pdtype')
         ;
     }
 

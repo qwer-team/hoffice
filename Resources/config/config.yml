@@ -1,0 +1,6 @@
+services:
+    payment.create:
+        class: HOffice\AdminBundle\Lib\Payment\Service
+        tags:
+            - { name: kernel.event_listener, event: lala.fafa, method: listen }  
+      
