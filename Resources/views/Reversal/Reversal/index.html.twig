@@ -8,39 +8,50 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Contract_id</th>
                 <th>N</th>
                 <th>Date</th>
-                <th>Status</th>
-                <th>Oa1</th>
-                <th>Oa2</th>
-                <th>Txt1</th>
-                <th>Txt2</th>
-                <th>Summa1</th>
-                <th>Summa2</th>
-                <th>Summa3</th>
-                <th>Ucor</th>
-                <th>Dtcor</th>
-                <th>Contract_id</th>
+                <th>Saldo</th>
+                <th>pdl1</th>
+                <th>pdl2</th>
+                <th>pdl3</th>
+                <th>pdl4</th>
+                <th>pdl5</th>
+                <th>pdl6</th>
+                <th>pdl7</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
+        {% set j = 6 %}
         {% for entity in entities %}
+            {% set pdlines = entity.getPdlines() %}
             <tr>
                 <td><a href="{{ path('reversal_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.contractid }}</td>
                 <td>{{ entity.N }}</td>
                 <td>{% if entity.date %}{{ entity.date|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ entity.status }}</td>
+                <td>{{ entity.summa1 }}</td>
+                {% set i = 0 %}
+                {% for pdline in pdlines %}
+                    {% set i = i + 1 %}
+                    <td>{{ pdline.summa1 }}</td>
+                {% endfor%}
+                    
+                {% for k in 0..j - i %}
+                    <td></td>
+                {% endfor%}
+{#                <td>{{ entity.status }}</td>
                 <td>{{ entity.oa1 }}</td>
                 <td>{{ entity.oa2 }}</td>
                 <td>{{ entity.txt1 }}</td>
                 <td>{{ entity.txt2 }}</td>
-                <td>{{ entity.summa1 }}</td>
-                <td>{{ entity.summa2 }}</td>
+#}
+                
+{#                <td>{{ entity.summa2 }}</td>
                 <td>{{ entity.summa3 }}</td>
-                <td>{{ entity.ucor }}</td>
-                <td>{% if entity.dtcor %}{{ entity.dtcor|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ entity.contractid }}</td>
+#}
+               
                 <td>
                     <ul>
                         <li>

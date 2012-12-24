@@ -29,7 +29,8 @@ class ReversalController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('HOfficeAdminBundle:Reversal\Reversal')->findAll();
+        $entities = $em->getRepository('HOfficeAdminBundle:Reversal\Reversal')
+                       ->leftPdlines();
 
         return array(
             'entities' => $entities,

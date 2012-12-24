@@ -14,6 +14,7 @@ use Itc\AdminBundle\Tools\TranslitGenerator;
 use Symfony\Component\Locale\Locale;
 use Itc\AdminBundle\Tools\LanguageHelper;
 use Itc\AdminBundle\ItcAdminBundle;
+use Itc\DocumentsBundle\Entity\Pd\Pdl;
 use HOffice\AdminBundle\Form\Invoice\EditInvoiceType;
 use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
 /**
@@ -223,6 +224,7 @@ class InvoiceController extends Controller
         $locale =  LanguageHelper::getLocale();
         $context = ItcAdminBundle::getContainer();
         $entity = new Invoice();
+        
         $form   = $this->createForm(new InvoiceType(), $entity);
         $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
         $date = date("d/m/Y");
@@ -261,6 +263,14 @@ class InvoiceController extends Controller
         if ($form->isValid()) 
         {
             $em->persist($entity);
+            
+            foreach( $entity->getPdlines() as $f => $v ) {
+
+                $v->setPdid( $entity );
+                $em->persist( $v );
+
+            }
+            
             $em->flush();
             return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
@@ -294,8 +304,28 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
-   
-        $entity2 = $entity->getContract()->getServices();
+        $temp =$entity->getContract();
+        $entity2 = $temp->getServices();
+        
+        
+        
+        
+        
+        
+                
+        
+    /*    $oa1array = array( 1, 2, 3, 4, 5, 6 ); //services
+
+        foreach( $oa1array as $oa1 ){
+            $pdline1 = new Pdl; 
+            $pdline1->setOa1( $oa1 ) ;
+            $pdline1->setN( $oa1 ) ;
+            $entity->getPdlines()->add( $pdline1 );
+        }*/
+        
+        
+        
+        //$entity2 = $temp->getServices();
         /*$em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
                      ->createQueryBuilder( 'I' )
                      ->select( 'I, S' )
@@ -314,7 +344,11 @@ class InvoiceController extends Controller
         }
         
         $editForm = $this->createForm(new EditInvoiceType(),$entity);
-        $editForm2 = $this->createForm(new MetersEditInvoiceType(),$entity2);
+        foreach( $entity2 as $serv ){
+            $editForm2 = $this->createForm(new MetersEditInvoiceType(), $serv );
+            $editForm2->createView();
+            $servForm[] = $editForm2;
+        }
 //      $editForm = $this->createForm(new InvoiceType(), $entity);
 //      $deleteForm = $this->createDeleteForm($id);
 
@@ -322,7 +356,7 @@ class InvoiceController extends Controller
             'entity'      => $entity,
             'entity2'      => $entity2,
             'edit_form'   => $editForm->createView(),
-            'meters_edit_form'   => $editForm2->createView(),
+            'meters_edit_form'   => $servForm,
             //'delete_form' => $deleteForm->createView(),
         );
     }

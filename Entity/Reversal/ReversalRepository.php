@@ -12,4 +12,17 @@ use Doctrine\ORM\EntityRepository;
  */
 class ReversalRepository extends EntityRepository
 {
+    
+    function leftPdlines(){
+
+        $entities = $this->_em
+                         ->getRepository('HOfficeAdminBundle:Reversal\Reversal')
+                         ->createQueryBuilder( 'R' )
+                         ->select( "R, P")
+                         ->Leftjoin( "R.pdlines", "P")
+                         ->getQuery()
+                         ->execute();
+        return $entities;
+
+    }
 }
