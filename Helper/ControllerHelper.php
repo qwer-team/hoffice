@@ -1,6 +1,6 @@
 <?php
 
-namespace Main\SiteBundle\Helper;
+namespace HOffice\AdminBundle\Helper;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Itc\AdminBundle\Tools\LanguageHelper;

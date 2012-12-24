@@ -6,7 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Itc\DocumentsBundle\Form\Pd\PdlReversalType;
-use HOffice\AdminBundle\Form\Reversal\TagType;
 
 class ReversalType extends AbstractType
 {

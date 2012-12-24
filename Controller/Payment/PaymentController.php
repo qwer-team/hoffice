@@ -13,7 +13,7 @@ use HOffice\AdminBundle\Entity\Payment\Payment;
 use HOffice\AdminBundle\Form\Payment\PaymentType;
 use HOffice\AdminBundle\Form\Payment\SearchPaymentType;
 
-use Main\SiteBundle\Helper\ControllerHelper;
+use HOffice\AdminBundle\Helper\ControllerHelper;
 
 use Itc\AdminBundle\Tools\LanguageHelper;
 /**

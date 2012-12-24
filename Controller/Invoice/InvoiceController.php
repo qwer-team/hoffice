@@ -14,6 +14,7 @@ use Itc\AdminBundle\Tools\TranslitGenerator;
 use Symfony\Component\Locale\Locale;
 use Itc\AdminBundle\Tools\LanguageHelper;
 use Itc\AdminBundle\ItcAdminBundle;
+use Itc\DocumentsBundle\Entity\Pd\Pdl;
 use HOffice\AdminBundle\Form\Invoice\EditInvoiceType;
 use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
 /**
@@ -223,6 +224,7 @@ class InvoiceController extends Controller
         $locale =  LanguageHelper::getLocale();
         $context = ItcAdminBundle::getContainer();
         $entity = new Invoice();
+        
         $form   = $this->createForm(new InvoiceType(), $entity);
         $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
         $date = date("d/m/Y");
@@ -261,6 +263,14 @@ class InvoiceController extends Controller
         if ($form->isValid()) 
         {
             $em->persist($entity);
+            
+            foreach( $entity->getPdlines() as $f => $v ) {
+
+                $v->setPdid( $entity );
+                $em->persist( $v );
+
+            }
+            
             $em->flush();
             return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
@@ -296,6 +306,25 @@ class InvoiceController extends Controller
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
         $temp =$entity->getContract();
         $entity2 = $temp->getServices();
+        
+        
+        
+        
+        
+        
+                
+        
+    /*    $oa1array = array( 1, 2, 3, 4, 5, 6 ); //services
+
+        foreach( $oa1array as $oa1 ){
+            $pdline1 = new Pdl; 
+            $pdline1->setOa1( $oa1 ) ;
+            $pdline1->setN( $oa1 ) ;
+            $entity->getPdlines()->add( $pdline1 );
+        }*/
+        
+        
+        
         //$entity2 = $temp->getServices();
         /*$em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
                      ->createQueryBuilder( 'I' )

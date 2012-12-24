@@ -5,6 +5,7 @@ namespace HOffice\AdminBundle\Form\Invoice;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Itc\DocumentsBundle\Form\Pd\PdlReversalType;
 
 class InvoiceType extends AbstractType
 {
@@ -26,7 +27,7 @@ class InvoiceType extends AbstractType
                             'data-type-link' => "input",
                             'data-route' => "ajax_search_contract",
                             'data-after-search' => '.loadContractData'
-                            )));
+                            )))
             //->add('oa2')
             //->add('txt1')
             //->add('txt2')
@@ -36,6 +37,13 @@ class InvoiceType extends AbstractType
             //->add('ucor')
             //->add('dtcor')
             //->add('pdtype', null, $disable )    
+        ->add( "pdlines", 'collection', 
+                array(
+                    'type'         => new PdlReversalType(),
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+                    'by_reference' => true,
+                ) )
         ;
     }
     public function setDefaultOptions(OptionsResolverInterface $resolver)
