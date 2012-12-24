@@ -44,20 +44,7 @@ class ReversalController extends Controller
      */
     public function showAction($id)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('HOfficeAdminBundle:Reversal\Reversal')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Reversal\Reversal entity.');
-        }
-
-        $deleteForm = $this->createDeleteForm($id);
-
-        return array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),
-        );
+        return $this->redirect($this->generateUrl('reversal_edit', array('id' => $id)));
     }
 
     /**
@@ -137,7 +124,7 @@ class ReversalController extends Controller
             
             $em->flush();
 
-            return $this->redirect($this->generateUrl('reversal_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('reversal_edit', array('id' => $entity->getId())));
 
         }
 

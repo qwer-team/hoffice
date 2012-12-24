@@ -1,29 +1,32 @@
-<h1>Reversal\Reversal creation</h1>
+{% extends 'ItcAdminBundle::layouts/new.html.twig' %}
 
-<form action="{{ path('reversal_create') }}" method="post" {{ form_enctype(form) }}>
+{% import  'ItcAdminBundle::layouts/new.html.twig' as forms %}
 
-    {% set formPdl %}
+{% block header %}
 
-        {% for pdline in form.pdlines %}
-                {{ form_row(pdline.oa1) }}
-                {{ form_row(pdline.N) }}
-                {{ form_row(pdline.summa1) }}
-        {% endfor %}
+    <h1>Reversal\Reversal creation</h1>
 
-    {% endset %}
+{% endblock %}
+    
+{% block form %}
 
-    {{ form_widget(form) }}
+    <form action="{{ path('reversal_create') }}" method="post" {{ form_enctype(form) }}>
 
-    {{ formPdl }}
-    <p>
-        <button type="submit">Create</button>
-    </p>
-</form>
+        <button class = 'menu_sys_save_button' type="submit"></button>
 
-<ul class="record_actions">
-    <li>
-        <a href="{{ path('reversal') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+        {% set formPdl %}
+
+            {% for pdline in form.pdlines %}
+                    {{ form_row(pdline.oa1) }}
+                    {{ form_row(pdline.N) }}
+                    {{ form_row(pdline.summa1) }}
+            {% endfor %}
+
+        {% endset %}
+
+        {{ form_widget(form) }}
+
+        {{ formPdl }}
+    </form>
+
+{% endblock %}

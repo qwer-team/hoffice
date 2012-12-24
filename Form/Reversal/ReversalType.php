@@ -5,7 +5,7 @@ namespace HOffice\AdminBundle\Form\Reversal;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Itc\DocumentsBundle\Form\Pd\PdlReversalType;
+use HOffice\AdminBundle\Form\Reversal\ReversalPdlType;
 use HOffice\AdminBundle\Form\Reversal\TagType;
 
 class ReversalType extends AbstractType
@@ -14,28 +14,28 @@ class ReversalType extends AbstractType
     {
         $builder
             ->add('N')
-            ->add('date')
+            ->add('date', 'genemu_jquerydate')
             ->add('status')
-//            ->add('oa1')
-//            ->add('oa2')
-//            ->add('txt1')
-//            ->add('txt2')
             ->add('summa1')
             ->add('summa2')
             ->add('summa3')
-//            ->add('ucor')
-//            ->add('dtcor')
-//            ->add('contract_id')
             ->add('pdtype')
             ->add('contract')
             ->add( "pdlines", 'collection', 
                 array(
-                    'type'         => new PdlReversalType(),
+                    'type'         => new ReversalPdlType(),
                     'allow_add'    => true,
                     'allow_delete' => true,
                     'by_reference' => true,
                 ) 
             )
+//            ->add('oa1')
+//            ->add('oa2')
+//            ->add('txt1')
+//            ->add('txt2')
+//            ->add('ucor')
+//            ->add('dtcor')
+//            ->add('contract_id')
         ;
     }
 

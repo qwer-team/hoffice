@@ -1,61 +1,67 @@
-<h1>Reversal\Reversal list</h1>
+{% extends 'ItcAdminBundle::layouts/index.html.twig' %}
 
-<table class="records_list">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>N</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Oa1</th>
-            <th>Oa2</th>
-            <th>Txt1</th>
-            <th>Txt2</th>
-            <th>Summa1</th>
-            <th>Summa2</th>
-            <th>Summa3</th>
-            <th>Ucor</th>
-            <th>Dtcor</th>
-            <th>Contract_id</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for entity in entities %}
-        <tr>
-            <td><a href="{{ path('reversal_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-            <td>{{ entity.N }}</td>
-            <td>{% if entity.date %}{{ entity.date|date('Y-m-d H:i:s') }}{% endif %}</td>
-            <td>{{ entity.status }}</td>
-            <td>{{ entity.oa1 }}</td>
-            <td>{{ entity.oa2 }}</td>
-            <td>{{ entity.txt1 }}</td>
-            <td>{{ entity.txt2 }}</td>
-            <td>{{ entity.summa1 }}</td>
-            <td>{{ entity.summa2 }}</td>
-            <td>{{ entity.summa3 }}</td>
-            <td>{{ entity.ucor }}</td>
-            <td>{% if entity.dtcor %}{{ entity.dtcor|date('Y-m-d H:i:s') }}{% endif %}</td>
-            <td>{{ entity.contractid }}</td>
-            <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('reversal_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('reversal_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% block body %}
 
-<ul>
-    <li>
-        <a href="{{ path('reversal_new') }}">
-            Create a new entry
-        </a>
-    </li>
-</ul>
+    <h1>Reversal\Reversal list</h1>
+
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>N</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Oa1</th>
+                <th>Oa2</th>
+                <th>Txt1</th>
+                <th>Txt2</th>
+                <th>Summa1</th>
+                <th>Summa2</th>
+                <th>Summa3</th>
+                <th>Ucor</th>
+                <th>Dtcor</th>
+                <th>Contract_id</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('reversal_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.N }}</td>
+                <td>{% if entity.date %}{{ entity.date|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.status }}</td>
+                <td>{{ entity.oa1 }}</td>
+                <td>{{ entity.oa2 }}</td>
+                <td>{{ entity.txt1 }}</td>
+                <td>{{ entity.txt2 }}</td>
+                <td>{{ entity.summa1 }}</td>
+                <td>{{ entity.summa2 }}</td>
+                <td>{{ entity.summa3 }}</td>
+                <td>{{ entity.ucor }}</td>
+                <td>{% if entity.dtcor %}{{ entity.dtcor|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.contractid }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('reversal_show', { 'id': entity.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('reversal_edit', { 'id': entity.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('reversal_new') }}">
+                Create a new entry
+            </a>
+        </li>
+    </ul>
+
+{% endblock %}
