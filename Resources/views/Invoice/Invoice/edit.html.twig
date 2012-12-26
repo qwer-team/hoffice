@@ -39,9 +39,6 @@
                             <div class = 'fl'>
             {{ form_row( edit_form.name_ucor ) }}
         </div> 
-                            <div class = 'fl'>
-            {{ form_row( edit_form.dtcor ) }}
-        </div> 
             
             
             
@@ -49,13 +46,63 @@
         </div>
         <br class = 'clr' />
         <hr />
-        {{ form_rest(edit_form) }}
+        
         <br class = 'clr' />
         <hr />
-        {{ form_widget(meters_edit_form) }}
+        
+        
+            <table class="records_list counters">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Tariff</th>
+                <th>Current indicators</th>
+                <th>Previous indicators</th>
+                <th>Delta</th>
+                <th>Zumma</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in services %}
+                <tr>
+                    <td>{{service.id}}</td>
+                    <td>{{service.name}}</td>
+                    <td>price:{{service.price}}<br>price1:{{service.price1}}<br>sale:{{sale}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>All:</td>
+                <td id="all"></td>
+            </tr>
+        </tfoot>
+    </table>
+    <div hidden="hidden" id='err1'>Some error</div>
+        <br class = 'clr' />
+    <hr />
+        
+
+        
+             {% for pdline in edit_form.pdlines %}
+
+                    {{ form_row( pdline.oa1 ) }}
+                    {{ form_row( pdline.N ) }}
+                    {{ form_row( pdline.summa1 ) }}
+                    {{ form_row( pdline.summa3 ) }}
+                    {{ form_row( pdline.summa4 ) }}
+
+            {% endfor %}
+        {#${ form_widget(meters_edit_form) }}
         <br class = 'clr' />
         <hr />
-        {{ form_rest(meters_edit_form) }}
+        {{ form_rest(meters_edit_form) }#}
+    {{ form_rest(edit_form) }}
     </form>
 </div>
 {#

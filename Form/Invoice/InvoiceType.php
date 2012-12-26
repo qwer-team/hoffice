@@ -37,13 +37,6 @@ class InvoiceType extends AbstractType
             //->add('ucor')
             //->add('dtcor')
             //->add('pdtype', null, $disable )    
-        ->add( "pdlines", 'collection', 
-                array(
-                    'type'         => new PdlReversalType(),
-                    'allow_add'    => true,
-                    'allow_delete' => true,
-                    'by_reference' => true,
-                ) )
         ;
     }
     public function setDefaultOptions(OptionsResolverInterface $resolver)
