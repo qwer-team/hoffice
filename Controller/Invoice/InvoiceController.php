@@ -17,6 +17,8 @@ use Itc\AdminBundle\ItcAdminBundle;
 use Itc\DocumentsBundle\Entity\Pd\Pdl;
 use HOffice\AdminBundle\Form\Invoice\EditInvoiceType;
 use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
+use HOffice\AdminBundle\Entity\Service\Service;
+use Doctrine\Common\Collections;
 /**
  * Invoice\Invoice controller.
  *
@@ -67,7 +69,6 @@ class InvoiceController extends Controller
      */
     public function сlosedMonthAction(Request $request){
         
-        echo "wow";
         $em = $this->getDoctrine()->getManager();
         $locale =  LanguageHelper::getLocale();
 
@@ -243,7 +244,7 @@ class InvoiceController extends Controller
      *
      * @Route("/create", name="invoice_create")
      * @Method("POST")
-     * @Template("HOfficeAdminBundle:Invoice\Invoice:new.html.twig")
+     * @Template("HOfficeAdminBundle:Invoice\Invoice:edit.html.twig")
      */
     public function createAction(Request $request)
     {
@@ -252,45 +253,35 @@ class InvoiceController extends Controller
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
         $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
-                       ->find($entity->getContractId());
+                     ->find($entity->getContractId());
         $entity->setContract($contract);
         $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
         $entity->setPdtype($pdtype);
         $entity->setSumma1(0);
-        $entity->setSumma2(0);
-        
-        
+        //$context = ItcAdminBundle::getContainer();
+        //$usr = $context->get('security.context')->getToken()->getUser();
         if ($form->isValid()) 
         {
             $em->persist($entity);
-            
-            foreach( $entity->getPdlines() as $f => $v ) {
-
-                $v->setPdid( $entity );
-                $em->persist( $v );
-
-            }
-            
             $em->flush();
+           // echo 'Ucor = '.$entity->getUcor();
+           // $entity = $em->getRepository("ItcDocumentsBundle:Pd\Pd")->find($entity->getId());
+           // echo '<br>2Ucor = '.$entity->getUcor();
+            $services = $entity->getContract()->getServices();
+            foreach($services as $service)
+            {
+                $pdline = new Pdl();
+                $pdline->setPd($entity);
+                $pdline->setOa1($service->getId());
+                $em->persist($pdline);
+                
+            }
+            $em->flush();
+            //echo 'Ucor = '.$entity->getUcor();
             return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
             print_r($form->getErrors());
         }
-        
-        $languages  = LanguageHelper::getLanguages();
-        $locale =  LanguageHelper::getLocale();
-        $context = ItcAdminBundle::getContainer();
-        $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
-        $date = date("d/m/Y");
-        
-        return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-            'locale' => $locale,
-            'languages' => $languages,
-            'date' => $date,
-            'user' => $usr,
-        );
     }
 
     /**
@@ -302,62 +293,137 @@ class InvoiceController extends Controller
     public function editAction($id)
     {
         $em = $this->getDoctrine()->getManager();
-
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
-        $temp =$entity->getContract();
-        $entity2 = $temp->getServices();
+        
+        /*$oldInvoice = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')
+                     ->createQueryBuilder( "I" )
+                     ->select('I')
+                     ->where( 'I.contract = :contract')
+                     ->setParameter( 'contract', $entity->getContract( )->getId())
+                     ->andWhere( "I.date < :date")
+                     ->setParameter( 'date', $entity->getDate() )
+                     ->orderBy( 'I.date', 'desc')
+                     ->setMaxResults( 1 )
+                     ->getQuery()
+                     ->getOneOrNullResult();*/
+        
+        $rests = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
+                    ->createQueryBuilder( "R" )
+                    ->select('R')
+                    ->where( 'R.l1 = :contractid')
+                    ->setParameter( 'contractid', $entity->getContract( )->getId())
+                    ->andWhere( "R.y = :year")
+                    ->setParameter( 'year', $entity->getDate()->format('Y'))
+                    ->andWhere( "R.m = :month")
+                    ->setParameter( 'month', $entity->getDate()->format('m'))
+                    ->orderBy('R.l2')
+                    ->getQuery()
+                    ->execute();
+//        echo 'ID = '.$entity->getContract( )->getId().'<br/>';
+//        echo 'YEAR = '.$entity->getDate()->format('Y').'<br/>';
+//        echo 'MONTH = '.$entity->getDate()->format('m').'<br/>';
+//        echo 'COUNT= '.count($rest).'<br/>';
+//            foreach ($rest as $value) {
+//                echo 'L1 = '.$value->getL1().'<br/>';
+//                echo 'L2 = '.$value->getL2().'<br/>';
+//                echo 'SD = '.$value->getSd().'<br/>';
+//            }
+        
+        $services = $entity->getContract()->getServices();
+//        for ($i = 0; $i < count($services); $i++) {
+//            for ($z = 0; $z < count($rest); $z++) {
+//                if($rest[$z]->getL2()==$services[$i]->getId()){
+//                     $services[$i]->add('sd',$rest[$z]->getSd());
+//                }
+//            }
+//        }
+        //$pdlines = new Collections\ArrayCollection();
+        
+        //if(count($entity->getPdlines())<=0)
+       // {
+            foreach($services as $service)
+            {
+                //$pdlines->set( $pdline->getOa1(), $pdline );
+                $create_new = true;
+                foreach( $entity->getPdlines() as $pdl ){
+                    if($service->getId() == $pdl->getOa1()){
+                        $create_new = false;
+                        }
+                }
+                if($create_new){
+                    $pdline1 = new Pdl; 
+                    //$pdline1->setPdid($entity->getId());
+                    $pdline1->setOa1($service->getId());
+                    foreach ($rests as $rest) {
+                        if($rest->getL2()==$service->getId()){
+                            $pdline1->setSumma2($rest->getSd());
+                        }
+                    }
+                    //$pdlines->set( $pdline1->getOa1(), $pdline1 );
+                    $entity->getPdlines()->add( $pdline1 );
+                }
+            }//$entity->getPdlines()->add( $pdlines);
+        //}
         
         
         
         
         
+//        foreach( $services as $service ){
+//            $true = false;
+//            foreach( $entity->getPdlines() as $pdl ){
+//                
+//                $true = ( $service->getId() == $pdl->getOa1() || $pdlines->get( $service->getId() ));
+//                
+//                if( $true ) break;
+//            }
+//            
+//            if( $true ) {
+//                continue;
+//            }
+//            $pdline1 = new Pdl; 
+//            
+//            $pdline1->setPd( $entity );
+//            $pdline1->setOa1( $service->getId() ) ;
+//            $pdline1->setN( 123 ) ;
+//            
+//            $pdline1->setSumma3( $pdlines->get( $pdline->getOa1() )->getSumma4() ) ;
+//            $entity->getPdlines()->add( $pdline1 );
+//        }
         
-                
-        
-    /*    $oa1array = array( 1, 2, 3, 4, 5, 6 ); //services
-
-        foreach( $oa1array as $oa1 ){
-            $pdline1 = new Pdl; 
-            $pdline1->setOa1( $oa1 ) ;
-            $pdline1->setN( $oa1 ) ;
-            $entity->getPdlines()->add( $pdline1 );
-        }*/
         
         
         
-        //$entity2 = $temp->getServices();
-        /*$em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
-                     ->createQueryBuilder( 'I' )
-                     ->select( 'I, S' )
-                ->innerJoin('I.contract', 'C')
-                ->innerJoin('C.services', 'S')
-                ->where( "I.id  = :id" )
-                ->setParameter('id', $id)
-                ->getQuery()
-                ->execute();
-        */
+        
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
-        if (!$entity2) {
+        if (!$services) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
         
+        
+       // $pdline1 = new Collections\ArrayCollection();
+        
+       // foreach ($services as $service) {
+       //      $search_form[] = $this->createForm(new MetersEditInvoiceType($service))->createView();
+       // }
+        
+        
+        
+        
+       
         $editForm = $this->createForm(new EditInvoiceType(),$entity);
-        foreach( $entity2 as $serv ){
-            $editForm2 = $this->createForm(new MetersEditInvoiceType(), $serv );
-            $editForm2->createView();
-            $servForm[] = $editForm2;
-        }
-//      $editForm = $this->createForm(new InvoiceType(), $entity);
-//      $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
-            'entity2'      => $entity2,
-            'edit_form'   => $editForm->createView(),
-            'meters_edit_form'   => $servForm,
-            //'delete_form' => $deleteForm->createView(),
+           // 'search_form'   => $search_form,
+            'rests'         => $rests,
+            'entity'        => $entity,
+            'sale'          => $entity->getContract()->getSale(),
+            'services'      => $services,
+            'edit_form'     => $editForm->createView(),
+            // 'meters_edit_form'   => $servForm->createView(),
+            // 'delete_form' => $deleteForm->createView(),
         );
     }
 
@@ -379,20 +445,23 @@ class InvoiceController extends Controller
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new InvoiceType(), $entity);
+        $editForm = $this->createForm(new EditInvoiceType(), $entity);
         $editForm->bind($request);
 
         if ($editForm->isValid()) {
             $em->persist($entity);
+
             $em->flush();
 
             return $this->redirect($this->generateUrl('invoice_edit', array('id' => $id)));
         }
-
+        $services = $entity->getContract()->getServices();
         return array(
+            //'sale' => $entity->getContract()->getSale(),
             'entity'      => $entity,
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'services'      => $services,
         );
     }
 

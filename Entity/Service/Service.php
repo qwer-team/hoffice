@@ -64,7 +64,7 @@ class Service
     private $contracts;
     
     public function __construct() {
-        parent::__construct();
+        //parent::__construct();
         $this->contracts = new \Doctrine\Common\Collections\ArrayCollection();
     }
     

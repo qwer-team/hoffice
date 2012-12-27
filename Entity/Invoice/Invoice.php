@@ -18,10 +18,10 @@ use HOffice\AdminBundle\Entity\Contract\Contract;
 class Invoice extends Pd{
     /**
      * @var integer
-     * @Assert\NotNull()
+     *
+     * @ORM\Column(name="contract_id", type="integer", nullable=true)
      */
     private $contract_id;
-
     /**
      * @Assert\NotNull()
      * @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=true)
@@ -48,9 +48,10 @@ class Invoice extends Pd{
 
     public function setContract(Contract $contract) {
         $this->contract = $contract;
-        $this->contract_id = $contract->getId();
+        //$this->contract_id = $contract->getId();
     }
     public function getContractId() {
+        //$this->contract_id = $this->getContract()->getId();
         return $this->contract_id;
     }
 
