@@ -258,15 +258,10 @@ class InvoiceController extends Controller
         $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
         $entity->setPdtype($pdtype);
         $entity->setSumma1(0);
-        //$context = ItcAdminBundle::getContainer();
-        //$usr = $context->get('security.context')->getToken()->getUser();
         if ($form->isValid()) 
         {
             $em->persist($entity);
             $em->flush();
-           // echo 'Ucor = '.$entity->getUcor();
-           // $entity = $em->getRepository("ItcDocumentsBundle:Pd\Pd")->find($entity->getId());
-           // echo '<br>2Ucor = '.$entity->getUcor();
             $services = $entity->getContract()->getServices();
             foreach($services as $service)
             {
@@ -277,7 +272,6 @@ class InvoiceController extends Controller
                 
             }
             $em->flush();
-            //echo 'Ucor = '.$entity->getUcor();
             return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
             print_r($form->getErrors());
@@ -319,56 +313,41 @@ class InvoiceController extends Controller
                     ->orderBy('R.l2')
                     ->getQuery()
                     ->execute();
-//        echo 'ID = '.$entity->getContract( )->getId().'<br/>';
-//        echo 'YEAR = '.$entity->getDate()->format('Y').'<br/>';
-//        echo 'MONTH = '.$entity->getDate()->format('m').'<br/>';
-//        echo 'COUNT= '.count($rest).'<br/>';
-//            foreach ($rest as $value) {
-//                echo 'L1 = '.$value->getL1().'<br/>';
-//                echo 'L2 = '.$value->getL2().'<br/>';
-//                echo 'SD = '.$value->getSd().'<br/>';
-//            }
         
         $services = $entity->getContract()->getServices();
-//        for ($i = 0; $i < count($services); $i++) {
-//            for ($z = 0; $z < count($rest); $z++) {
-//                if($rest[$z]->getL2()==$services[$i]->getId()){
-//                     $services[$i]->add('sd',$rest[$z]->getSd());
-//                }
-//            }
-//        }
-        //$pdlines = new Collections\ArrayCollection();
+        
+        $pdlines = new Collections\ArrayCollection();
         
         //if(count($entity->getPdlines())<=0)
        // {
-            foreach($services as $service)
-            {
-                //$pdlines->set( $pdline->getOa1(), $pdline );
-                $create_new = true;
-                foreach( $entity->getPdlines() as $pdl ){
-                    if($service->getId() == $pdl->getOa1()){
-                        $create_new = false;
-                        }
-                }
-                if($create_new){
-                    $pdline1 = new Pdl; 
-                    //$pdline1->setPdid($entity->getId());
-                    $pdline1->setOa1($service->getId());
-                    foreach ($rests as $rest) {
-                        if($rest->getL2()==$service->getId()){
-                            $pdline1->setSumma2($rest->getSd());
-                        }
-                    }
-                    //$pdlines->set( $pdline1->getOa1(), $pdline1 );
-                    $entity->getPdlines()->add( $pdline1 );
-                }
-            }//$entity->getPdlines()->add( $pdlines);
-        //}
+//            foreach($services as $service)
+//            {
+//                //$pdlines->set( $pdline->getOa1(), $pdline );
+//                $create_new = true;
+//                foreach( $entity->getPdlines() as $pdl ){
+//                    if($service->getId() == $pdl->getOa1()){
+//                        $create_new = false;
+//                        }
+//                }
+//                if($create_new){
+//                    $pdline1 = new Pdl; 
+//                    //$pdline1->setPdid($entity->getId());
+//                    $pdline1->setOa1($service->getId());
+//                    foreach ($rests as $rest) {
+//                        if($rest->getL2()==$service->getId()){
+//                            $pdline1->setSumma2($rest->getSd());
+//                        }
+//                    }
+//                    //$pdlines->set( $pdline1->getOa1(), $pdline1 );
+//                    $entity->getPdlines()->add( $pdline1 );
+//                }
+//            }//$entity->getPdlines()->add( $pdlines);
+//        //}
         
         
         
         
-        
+//        
 //        foreach( $services as $service ){
 //            $true = false;
 //            foreach( $entity->getPdlines() as $pdl ){

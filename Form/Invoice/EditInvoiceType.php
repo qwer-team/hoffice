@@ -28,7 +28,7 @@ class EditInvoiceType extends AbstractType
             ->add('summa1',null, $disable )
             //->add('summa2')
             //->add('summa3')
-            ->add('name_ucor',null, $disable )
+            ->add('ucor',null, $disable )
             //->add('dtcor','date', $disable )
             //->add('pdtype',null, $disable )
             ->add( "pdlines", 'collection', 

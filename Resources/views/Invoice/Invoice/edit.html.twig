@@ -37,7 +37,7 @@
             {{ form_row( edit_form.summa1 ) }}
         </div> 
                             <div class = 'fl'>
-            {{ form_row( edit_form.name_ucor ) }}
+            {{ form_row( edit_form.ucor ) }}
         </div> 
             
             
@@ -69,13 +69,13 @@
                     <td>{{service.id}}</td>
                     <td>{{service.name}}</td>
                     <td>price:{{service.price}}<br>price1:{{service.price1}}<br>sale:{{sale}}</td>
-                       {% for pdline in edit_form.pdlines %}                    
-                            {% if  service.id == pdline.oa1.get('value') %}
+                       {#% for pdline in edit_form.pdlines %}                    
+                            {% if  service.id == pdline.oa1.get('value') %#}
                             <td> 
-                                {{ form_widget( pdline.summa2 ) }} 
+                                {#{ form_widget( pdline.summa2 ) }#} 
                             </td> 
-                            {% endif %}
-                        {% endfor %}
+                            {#% endif %}
+                        {% endfor %#}
                    
                     {% for rest in rests %}
                         {% if  service.id == rest.l2 %}
@@ -94,14 +94,14 @@
         
 
         
-             {#% for pdline in edit_form.pdlines %}
-                    {{ form_row( pdline.oa1 ) }#}
+             {% for pdline in edit_form.pdlines %}
+                    {{ form_row( pdline.oa1 ) }}
                     {#{ form_row( pdline.N ) }#}
-                    {#{ form_row( pdline.summa1 ) }}
+                    {{ form_row( pdline.summa1 ) }}
                     {{ form_row( pdline.summa2 ) }}
-                    {{ form_row( pdline.pdid) }}
+                    {#{ form_row( pdline.pdid) }#}
 
-            {% endfor %#}
+            {% endfor %}
     
     
         {#${ form_widget(meters_edit_form) }}
