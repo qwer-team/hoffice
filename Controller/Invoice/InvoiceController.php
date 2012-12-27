@@ -13,7 +13,10 @@ use HOffice\AdminBundle\Form\Invoice\SearchInvoiceType;
 use Itc\AdminBundle\Tools\TranslitGenerator;
 use Symfony\Component\Locale\Locale;
 use Itc\AdminBundle\Tools\LanguageHelper;
-
+use Itc\AdminBundle\ItcAdminBundle;
+use Itc\DocumentsBundle\Entity\Pd\Pdl;
+use HOffice\AdminBundle\Form\Invoice\EditInvoiceType;
+use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
 /**
  * Invoice\Invoice controller.
  *
@@ -217,12 +220,21 @@ class InvoiceController extends Controller
      */
     public function newAction()
     {
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
+        $context = ItcAdminBundle::getContainer();
         $entity = new Invoice();
+        
         $form   = $this->createForm(new InvoiceType(), $entity);
-
+        $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
+        $date = date("d/m/Y");
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
+            'date' => $date,
+            'user' => $usr,
         );
     }
 
@@ -235,21 +247,49 @@ class InvoiceController extends Controller
      */
     public function createAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
         $entity  = new Invoice();
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
-
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+        $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
+                       ->find($entity->getContractId());
+        $entity->setContract($contract);
+        $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
+        $entity->setPdtype($pdtype);
+        $entity->setSumma1(0);
+        $entity->setSumma2(0);
+        
+        
+        if ($form->isValid()) 
+        {
             $em->persist($entity);
+            
+            foreach( $entity->getPdlines() as $f => $v ) {
+
+                $v->setPdid( $entity );
+                $em->persist( $v );
+
+            }
+            
             $em->flush();
-
-            return $this->redirect($this->generateUrl('invoice_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
+        }else{
+            print_r($form->getErrors());
         }
-
+        
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
+        $context = ItcAdminBundle::getContainer();
+        $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
+        $date = date("d/m/Y");
+        
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
+            'date' => $date,
+            'user' => $usr,
         );
     }
 
@@ -264,18 +304,60 @@ class InvoiceController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
+        $temp =$entity->getContract();
+        $entity2 = $temp->getServices();
+        
+        
+        
+        
+        
+        
+                
+        
+    /*    $oa1array = array( 1, 2, 3, 4, 5, 6 ); //services
 
+        foreach( $oa1array as $oa1 ){
+            $pdline1 = new Pdl; 
+            $pdline1->setOa1( $oa1 ) ;
+            $pdline1->setN( $oa1 ) ;
+            $entity->getPdlines()->add( $pdline1 );
+        }*/
+        
+        
+        
+        //$entity2 = $temp->getServices();
+        /*$em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
+                     ->createQueryBuilder( 'I' )
+                     ->select( 'I, S' )
+                ->innerJoin('I.contract', 'C')
+                ->innerJoin('C.services', 'S')
+                ->where( "I.id  = :id" )
+                ->setParameter('id', $id)
+                ->getQuery()
+                ->execute();
+        */
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
-
-        $editForm = $this->createForm(new InvoiceType(), $entity);
-        $deleteForm = $this->createDeleteForm($id);
+        if (!$entity2) {
+            throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
+        }
+        
+        $editForm = $this->createForm(new EditInvoiceType(),$entity);
+        foreach( $entity2 as $serv ){
+            $editForm2 = $this->createForm(new MetersEditInvoiceType(), $serv );
+            $editForm2->createView();
+            $servForm[] = $editForm2;
+        }
+//      $editForm = $this->createForm(new InvoiceType(), $entity);
+//      $deleteForm = $this->createDeleteForm($id);
 
         return array(
             'entity'      => $entity,
+            'entity2'      => $entity2,
             'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'meters_edit_form'   => $servForm,
+            //'delete_form' => $deleteForm->createView(),
         );
     }
 

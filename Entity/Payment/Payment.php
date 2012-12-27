@@ -132,12 +132,17 @@ class Payment extends Pd {
     /** @ORM\PostUpdate() */
     public function createTransaction(){
         
-        $container = \Itc\AdminBundle\ItcAdminBundle::getContainer();
-        $dispatcher = $container->get("event_dispatcher");
+        if( $this->oldstatus == $this->status || is_null($this->oldstatus)) return;
         
-        $event = new PaymentEvent($this);
-        $dispatcher->dispatch("lala.fafa", $event);
-        
+        if ($this->status == 3 || ($this->status == 2 && $this->oldstatus == 3))
+        {
+            $container = \Itc\AdminBundle\ItcAdminBundle::getContainer();
+            $dispatcher = $container->get("event_dispatcher");
+
+            $event = new PaymentEvent($this);
+            $dispatcher->dispatch("payment.update_trans", $event);        
+            
+        }
     }
 
 }

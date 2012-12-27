@@ -16,11 +16,9 @@ use HOffice\AdminBundle\Entity\Contract\Contract;
  * @ORM\HasLifecycleCallbacks
  */
 class Invoice extends Pd{
-    
     /**
      * @var integer
      * @Assert\NotNull()
-     * @ORM\Column(name="contract_id", type="integer", nullable=true)
      */
     private $contract_id;
 
@@ -67,5 +65,14 @@ class Invoice extends Pd{
     {
         return $this->payments;
     }   
+  /** @ORM\PostLoad */
+    public function resetContactId()
+    {
+        $this->contract_id = $this->getContractId();
+    }    
+    /** @ORM\PostUpdate() */
+    public function createTransaction(){
+        echo "qqq";
+    }    
 
 }

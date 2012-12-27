@@ -33,7 +33,6 @@ class Service
 
     /**
      * @var string
-     *
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
@@ -59,6 +58,48 @@ class Service
      */
     private $unit;
 
+   /**
+     * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", mappedBy="services")
+     */
+    private $contracts;
+    
+    public function __construct() {
+        parent::__construct();
+        $this->contracts = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
+    /**
+     * Add contracts
+     *
+     * @param Itc\AdminBundle\Entity\Contract\Contract $contracts
+     * @return Keyword
+     */
+    public function addContracts(\Itc\AdminBundle\Entity\Contract\Contract $contracts)
+    {
+        $this->contracts[] = $contracts;
+    
+        return $this;
+    }
+
+    /**
+     * Remove contracts
+     *
+     * @param Itc\AdminBundle\Entity\Contract\Contract $contracts
+     */
+    public function removeContracts(\Itc\AdminBundle\Entity\Contract\Contract $contracts)
+    {
+        $this->contracts->removeElement($contracts);
+    }
+
+    /**
+     * Get contracts
+     *
+     * @return Doctrine\Common\Collections\Collection 
+     */
+    public function getContracts()
+    {
+        return $this->contracts;
+    }
     /**
      * Get id
      *

@@ -10,6 +10,7 @@ class ServiceTest extends KernelAwareTest
 {
     private $service;
     private $payment;
+    
     public function setUp() {
         parent::setUp();
         $invoice = new Invoice();
@@ -25,6 +26,7 @@ class ServiceTest extends KernelAwareTest
         $this->payment->setN(1);
         $this->payment->setStatus(1);
         $this->payment->setInvoice($invoice);
+        
         $this->service = new Service($this->payment, $this->container);
     }
     
@@ -39,18 +41,20 @@ class ServiceTest extends KernelAwareTest
         $this->service->execute();
                       
         $ent = $repo->findAll();
-/*        foreach($ent as $n){
-            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
+        foreach($ent as $n){
+//            \Doctrine\Common\Util\Debug::dump(//"l1=".$n->getL1()."l2=".$n->getL2()."l3=".$n->getL3());
+//            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd()."Iacc=".$n->getAccId());
         }
-  */
+//        \Doctrine\Common\Util\Debug::dump($this->payment);
+//        \Doctrine\Common\Util\Debug::dump($invoice);
         $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Trans");
         $trans = $repo->findAll();
-/*        foreach($trans as $n){
-            \Doctrine\Common\Util\Debug::dump($n, 2);
+        foreach($trans as $n){
+            \Doctrine\Common\Util\Debug::dump("sum=".$n->getSumma()."iacc=".$n->getIaccId()."oacc=".$n->getOaccId()."pd=".$n->getPd()->getId());
         }
-  */      $this->assertEquals(1, count($trans));
+  //      $this->assertEquals(1, count($trans));
         
-        $this->assertEquals(24, count($ent));
+        $this->assertEquals(48, count($ent));
     }
     
     public function testSummLess()
@@ -61,10 +65,10 @@ class ServiceTest extends KernelAwareTest
         $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Rest");              
         
         $ent = $repo->findAll();
-/*        foreach($ent as $n){
-            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
+        foreach($ent as $n){
+//            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
         }
-*/        $this->assertEquals(24, count($ent));
+        $this->assertEquals(48, count($ent));
     }
 
     public function testSummMore()
@@ -76,16 +80,16 @@ class ServiceTest extends KernelAwareTest
               
         
         $ent = $repo->findAll();
-/*        foreach($ent as $n){
-            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
+        foreach($ent as $n){
+            //\Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
         }
-*/      
+/*  
         $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Trans");
         
         $trans = $repo->findAll();
         $this->assertEquals(1, count($trans));
          
-        $this->assertEquals(24, count($ent));
+*/        $this->assertEquals(72, count($ent));
     }
     private function paymentSummas($summa1, $summa2, $summa3)
     {

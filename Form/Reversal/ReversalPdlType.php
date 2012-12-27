@@ -1,40 +1,36 @@
 <?php
 
-namespace HOffice\AdminBundle\Form\Payment;
+namespace HOffice\AdminBundle\Form\Reversal;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class PaymentType extends AbstractType
+class ReversalPdlType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('N')
-            ->add('date', 'genemu_jquerydate')
-            ->add('status')
+            ->add( 'N' )
+            ->add( 'oa1', 'hidden' )
             ->add('summa1')
-            ->add('contract')
 //            ->add('summa2')
 //            ->add('summa3')
-//            ->add('ucor')
-//            ->add('dtcor', 'genemu_jquerydate')
-            ->add('contract')
-            ->add('invoice')
-            ->add('pdtype')
+//            ->add('summa4')
+//            ->add('summa5')
+//            ->add('summa6')
         ;
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'HOffice\AdminBundle\Entity\Payment\Payment'
+            'data_class' => 'Itc\DocumentsBundle\Entity\Pd\Pdl'
         ));
     }
 
     public function getName()
     {
-        return 'hoffice_adminbundle_payment_paymenttype';
+        return 'itc_documentsbundle_pd_pdltype';
     }
 }

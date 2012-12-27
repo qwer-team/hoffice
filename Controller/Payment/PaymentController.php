@@ -13,7 +13,7 @@ use HOffice\AdminBundle\Entity\Payment\Payment;
 use HOffice\AdminBundle\Form\Payment\PaymentType;
 use HOffice\AdminBundle\Form\Payment\SearchPaymentType;
 
-use Itc\AdminBundle\Controller\BaseController;
+use HOffice\AdminBundle\Helper\ControllerHelper;
 
 use Itc\AdminBundle\Tools\LanguageHelper;
 /**
@@ -21,7 +21,7 @@ use Itc\AdminBundle\Tools\LanguageHelper;
  *
  * @Route("/payment")
  */
-class PaymentController extends BaseController {
+class PaymentController extends ControllerHelper {
     
     private $payment = "HOfficeAdminBundle:Payment\Payment";
 
@@ -36,6 +36,11 @@ class PaymentController extends BaseController {
      * @Template()
      */
     public function indexAction( $coulonpage = 10, $page ) {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $rest = $em->getRepository('Itc\DocumentsBundle\Entity\Pd\Rest')
+                   ->find(1, array( "l1" => 1 ), "2012", "1:10" );
 
         $select = "SUM( P.summa1 ) AS summa1, 
                    SUM( P.summa2 ) AS summa2, 
@@ -64,6 +69,18 @@ class PaymentController extends BaseController {
             'coulonpage'  => $coulonpage,
 
         );
+
+    }
+
+    /**
+     * @Route(
+     *      "/", name="payment_index"
+     * )
+     * @Template()
+     */
+    public function index1Action() {
+
+        return $this->redirect( $this->generateUrl( 'payment', array() ) );
 
     }
 
@@ -133,7 +150,7 @@ class PaymentController extends BaseController {
     }
     
     function getSearchQuery( $select, $data ){
-        
+
         $this->resetParam();
 
         $qb = $this->getQbAllJoins( $select );
@@ -248,6 +265,14 @@ class PaymentController extends BaseController {
         $apartment = $contract->getApartment();
         $house     = $apartment->getHouse();
 
+        $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
+
+        $y = date("m") == 12 ? date("Y") + 1 : date("Y");
+        $m = date("m") == 12 ? 1 : date("m") + 1;
+        
+        $restPd = $repo->findOne( 3, array(
+            "l1"=>$contract->getId(), "l2"=>NULL, "l3"=>NULL), $y, $m );
+        echo is_object($restPd) ? $restPd->getSd() : 0;
         return array(
 
             'entity'        => $entity,

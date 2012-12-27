@@ -1,0 +1,81 @@
+<h1>Reversal\Reversal</h1>
+
+<table class="record_properties">
+    <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ entity.id }}</td>
+        </tr>
+        <tr>
+            <th>N</th>
+            <td>{{ entity.N }}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>{{ entity.date|date('Y-m-d H:i:s') }}</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>{{ entity.status }}</td>
+        </tr>
+        <tr>
+            <th>Oa1</th>
+            <td>{{ entity.oa1 }}</td>
+        </tr>
+        <tr>
+            <th>Oa2</th>
+            <td>{{ entity.oa2 }}</td>
+        </tr>
+        <tr>
+            <th>Txt1</th>
+            <td>{{ entity.txt1 }}</td>
+        </tr>
+        <tr>
+            <th>Txt2</th>
+            <td>{{ entity.txt2 }}</td>
+        </tr>
+        <tr>
+            <th>Summa1</th>
+            <td>{{ entity.summa1 }}</td>
+        </tr>
+        <tr>
+            <th>Summa2</th>
+            <td>{{ entity.summa2 }}</td>
+        </tr>
+        <tr>
+            <th>Summa3</th>
+            <td>{{ entity.summa3 }}</td>
+        </tr>
+        <tr>
+            <th>Ucor</th>
+            <td>{{ entity.ucor }}</td>
+        </tr>
+        <tr>
+            <th>Dtcor</th>
+            <td>{{ entity.dtcor|date('Y-m-d H:i:s') }}</td>
+        </tr>
+        <tr>
+            <th>Contract_id</th>
+            <td>{{ entity.contractid }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<ul class="record_actions">
+    <li>
+        <a href="{{ path('reversal') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('reversal_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>
+        <form action="{{ path('reversal_delete', { 'id': entity.id }) }}" method="post">
+            {{ form_widget(delete_form) }}
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+</ul>
