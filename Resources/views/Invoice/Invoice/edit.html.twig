@@ -69,19 +69,24 @@
                     <td>{{service.id}}</td>
                     <td>{{service.name}}</td>
                     <td>price:{{service.price}}<br>price1:{{service.price1}}<br>sale:{{sale}}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                       {% for pdline in edit_form.pdlines %}                    
+                            {% if  service.id == pdline.oa1.get('value') %}
+                            <td> 
+                                {{ form_widget( pdline.summa2 ) }} 
+                            </td> 
+                            {% endif %}
+                        {% endfor %}
+                   
+                    {% for rest in rests %}
+                        {% if  service.id == rest.l2 %}
+                            <td>{{rest.sd}}</td>
+                            <td>{{rest.od}}</td>
+                            <td>{{rest.oc}}</td>
+                        {% endif %}
+                    {% endfor %}
                 </tr>
         {% endfor %}
         </tbody>
-        <tfoot>
-            <tr>
-                <td>All:</td>
-                <td id="all"></td>
-            </tr>
-        </tfoot>
     </table>
     <div hidden="hidden" id='err1'>Some error</div>
         <br class = 'clr' />
@@ -89,15 +94,16 @@
         
 
         
-             {% for pdline in edit_form.pdlines %}
+             {#% for pdline in edit_form.pdlines %}
+                    {{ form_row( pdline.oa1 ) }#}
+                    {#{ form_row( pdline.N ) }#}
+                    {#{ form_row( pdline.summa1 ) }}
+                    {{ form_row( pdline.summa2 ) }}
+                    {{ form_row( pdline.pdid) }}
 
-                    {{ form_row( pdline.oa1 ) }}
-                    {{ form_row( pdline.N ) }}
-                    {{ form_row( pdline.summa1 ) }}
-                    {{ form_row( pdline.summa3 ) }}
-                    {{ form_row( pdline.summa4 ) }}
-
-            {% endfor %}
+            {% endfor %#}
+    
+    
         {#${ form_widget(meters_edit_form) }}
         <br class = 'clr' />
         <hr />
