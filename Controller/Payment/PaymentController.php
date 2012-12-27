@@ -100,7 +100,7 @@ class PaymentController extends ControllerHelper {
 
     }
 
-        /**
+    /**
      * @Route("/{coulonpage}/search", name="payment_search",
      * requirements={"coulonpage" = "\d+"}, 
      * defaults={"coulonpage" = "100"})
@@ -224,6 +224,10 @@ class PaymentController extends ControllerHelper {
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $securityContext = $this->container->get('security.context');
+            $user= $securityContext->getToken()->getUser();
+//            $entity->set $user->getId();
+
             $em->persist($entity);
             $em->flush();
 
@@ -261,6 +265,14 @@ class PaymentController extends ControllerHelper {
         $apartment = $contract->getApartment();
         $house     = $apartment->getHouse();
 
+        $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
+
+        $y = date("m") == 12 ? date("Y") + 1 : date("Y");
+        $m = date("m") == 12 ? 1 : date("m") + 1;
+        
+        $restPd = $repo->findOne( 3, array(
+            "l1"=>$contract->getId(), "l2"=>NULL, "l3"=>NULL), $y, $m );
+        echo is_object($restPd) ? $restPd->getSd() : 0;
         return array(
 
             'entity'        => $entity,
@@ -297,7 +309,22 @@ class PaymentController extends ControllerHelper {
      * @Template("HOfficeAdminBundle:Payment\Payment:edit.html.twig")
      */
     public function paymentApproved( Request $request, $id ){
-
+        
+        $em = $this->getDoctrine()->getManager();
+        $rArray = array( "id" => $id );
+        $entity = $em->getRepository( $this->payment )
+                ->createQueryBuilder('P')
+                ->select('P, I')
+                ->innerJoin('P.invoice', 'I')
+                ->where("P.id = :id")
+                ->setParameter("id", $id)
+                ->getQuery()
+                ->getOneOrNullResult();
+        
+        $invoice_status = $entity->getInvoice()->getStatus();
+        if ($invoice_status == 1)
+            return $this->redirect( $this->generateUrl( 'payment_edit', $rArray ) );
+        
         return $this->paymentChangeStatus( $request, $id, 2 );
     }
     /**

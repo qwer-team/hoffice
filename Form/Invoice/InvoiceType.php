@@ -17,6 +17,7 @@ class InvoiceType extends AbstractType
                                     ->setParameter("house_id", $this->house_id)
                                     ->orderBy('a.name', 'ASC'); */
         $builder
+//            ->add('pdtype_id')
             ->add('N')
             //->add('date')
             //->add('status', null, $disable )

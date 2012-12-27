@@ -1,2 +1,7 @@
+services:
+    payment.create:
+        class: HOffice\AdminBundle\Lib\Payment\Service
+        tags:
+            - { name: kernel.event_listener, event: payment.update_trans, method: onPaymentUpdateTrans }  
 imports:
-    - { resource: addParameters.yml }
+    - { resource: addParameters.yml }      
