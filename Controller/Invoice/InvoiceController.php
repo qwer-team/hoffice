@@ -244,7 +244,7 @@ class InvoiceController extends Controller
      *
      * @Route("/create", name="invoice_create")
      * @Method("POST")
-     * @Template("HOfficeAdminBundle:Invoice\Invoice:edit.html.twig")
+     * @Template("HOfficeAdminBundle:Invoice\Invoice:new.html.twig")
      */
     public function createAction(Request $request)
     {
@@ -253,7 +253,7 @@ class InvoiceController extends Controller
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
         $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
-                     ->find($entity->getContractId());
+                     ->find($entity->getContract()->getId());
         $entity->setContract($contract);
         $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
         $entity->setPdtype($pdtype);
@@ -261,7 +261,7 @@ class InvoiceController extends Controller
         if ($form->isValid()) 
         {
             $em->persist($entity);
-            $em->flush();
+            
             $services = $entity->getContract()->getServices();
             foreach($services as $service)
             {
@@ -272,10 +272,25 @@ class InvoiceController extends Controller
                 
             }
             $em->flush();
-            return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
+            
+           return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
-            print_r($form->getErrors());
+            print_r($form->getErrorsAsString());
         }
+        
+        $languages  = LanguageHelper::getLanguages();
+        $locale =  LanguageHelper::getLocale();
+        $context = ItcAdminBundle::getContainer();
+        $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
+        $date = date("d/m/Y");
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+            'locale' => $locale,
+            'languages' => $languages,
+            'date' => $date,
+            'user' => $usr,
+        );
     }
 
     /**
@@ -300,23 +315,29 @@ class InvoiceController extends Controller
                      ->setMaxResults( 1 )
                      ->getQuery()
                      ->getOneOrNullResult();*/
-        
-        $rests = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
-                    ->createQueryBuilder( "R" )
-                    ->select('R')
-                    ->where( 'R.l1 = :contractid')
-                    ->setParameter( 'contractid', $entity->getContract( )->getId())
-                    ->andWhere( "R.y = :year")
-                    ->setParameter( 'year', $entity->getDate()->format('Y'))
-                    ->andWhere( "R.m = :month")
-                    ->setParameter( 'month', $entity->getDate()->format('m'))
-                    ->orderBy('R.l2')
-                    ->getQuery()
-                    ->execute();
+        $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
+        $rests = $repo->find( 2, array('l1'=>$entity->getContract( )->getId()), $entity->getDate()->format('Y'), $entity->getDate()->format('m') );
+        echo 'Y = '.$entity->getDate()->format('Y').'<br>';
+        echo 'M = '.$entity->getDate()->format('m').'<br>';
+        echo 'Cont = '.$entity->getContract( )->getId().'<br>';
+        //echo 'obj = '.is_object($rests).'<br>';
+       // echo 'count = '.count($rests);
+//        $rests = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
+//                    ->createQueryBuilder( "R" )
+//                    ->select('R')
+//                    ->where( 'R.l1 = :contractid')
+//                    ->setParameter( 'contractid', $entity->getContract( )->getId())
+//                    ->andWhere( "R.y = :year")
+//                    ->setParameter( 'year', )
+//                    ->andWhere( "R.m = :month")
+//                    ->setParameter( 'month', )
+//                    ->orderBy('R.l2')
+//                    ->getQuery()
+//                    ->execute();
         
         $services = $entity->getContract()->getServices();
         
-        $pdlines = new Collections\ArrayCollection();
+        //$pdlines = new Collections\ArrayCollection();
         
         //if(count($entity->getPdlines())<=0)
        // {
