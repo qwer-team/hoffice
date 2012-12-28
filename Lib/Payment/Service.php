@@ -25,11 +25,13 @@ class Service {
     function __construct($payment = null, $container = null) {
         $this->payment = $payment;
         $this->container = \Itc\AdminBundle\ItcAdminBundle::getContainer();//$container;
+        $this->invoice = $this->payment->getInvoice();
+        $this->contract = $this->invoice->getContract();        
     }    
 
     public function execute()
-    {
-        if ($this->payment->getStatus() == 3 )
+    {        
+        if ($this->payment->getStatus() == 2 )
         {
             $this->createPaymentTrans();
         }
@@ -39,18 +41,19 @@ class Service {
         }
     }
     
-    protected function createPaymentTrans(){
+    protected function createPaymentTrans()
+    {
         
         $em = $this->container->get("doctrine")->getEntityManager();                       
         
-        $this->invoice = $this->payment->getInvoice();
-        $this->contract = $this->invoice->getContract();        
         $paid_invoices = array();
         $invoices = array();
+        $payment_sum = $this->payment->getSumma1();
+        $invoice_sum = $this->invoice->getSumma1();
         
         if ($payment_sum >= $invoice_sum)
         {
-            $this->invoice->setStatus(3);
+            $this->invoice->setStatus(2);
         }
         
         if ($payment_sum > $invoice_sum)
@@ -70,7 +73,7 @@ class Service {
             {
                 $this->addTrans( $entry );                
             }
-            print_r($paid_invoices);
+            
             if (count($paid_invoices) > 0) {
                 
                 $invoices = 
@@ -81,9 +84,8 @@ class Service {
                     $invoice->setStatus(3);
                     $em->persist( $invoice );
                 }   
-                echo "invoice=".$invoice->getId()."<br/>";
+                
             }
-            print_r($this->trans);
         }
         else 
         {
@@ -96,11 +98,13 @@ class Service {
                                    ) );
             
         }
-//        print_r($this->getTrans());
+        
         foreach( Trans::getTransactions( $this->payment, $this->getTrans() )
-                        as $entity ){
-                                $em->persist( $entity );
-                                }
+                                                                    as $entity )
+        {
+            $em->persist( $entity );
+        }
+        
         $em->flush();        
     }
 
@@ -118,14 +122,14 @@ class Service {
         }
         
         $pu->removeTransOnChangeStatusPd( $this->payment );
-        print_r($invoices);
+        
         $cancelled_invoices = 
                     $em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
                        ->findBy( array( 'id' => $invoices ) );
         
         foreach($cancelled_invoices as $invoice)
         {
-            $invoice->setStatus(2);
+            $invoice->setStatus(1);
             $em->persist( $invoice );
         }
         
@@ -166,8 +170,6 @@ class Service {
   
     public function onPaymentUpdateTrans($event)
     {
-        $em = $this->container->get("doctrine")->getEntityManager(); 
-        
         $create = $event->getCreate();
         
         $this->service = new Service($create);
@@ -204,10 +206,8 @@ class Service {
                   "l2" => NULL,
                   "l3" => NULL,
                  ));
-        echo '<br />sum ='.$sum.", dif =".$difference.'<br />';
-        echo $this->balance."---<br/>";
+        
         $this->balance -= $sum;
-        echo $this->balance."---";
         $trans = array();
         $paid_invoices = array();
         
@@ -218,7 +218,7 @@ class Service {
             
             $qb = $repo->createQueryBuilder('I')
                         ->select('I')
-                        ->where('I.status = 2')
+                        ->where('I.status = 1')
                         ->andWhere('I.id != :id')
                         ->setParameter('id', $this->invoice->getId())
                         ->orderBy('I.dtcor', 'DESC');
@@ -235,9 +235,7 @@ class Service {
                                   $y, $m );
                 $invoice_sum = $restPd->getSd() > $difference ? 
                             $difference : $restPd->getSd();
-                echo 'sum='.$difference.'inv_sum='.$invoice_sum.'restPd->getSd()'.$restPd->getSd().'<br/>';
                 $difference -= $invoice_sum;
-                echo 'sum='.$difference.'inv_sum='.$invoice_sum.'<br/>';
                 
                 if ($restPd->getSd() == $invoice_sum){
                     $paid_invoices[] = $invoice->getId();
@@ -252,7 +250,6 @@ class Service {
                 
         }
         $trans[] = array('oaccid'  => 3, 'summa' => $difference );
-     //  print_r($trans);
         return array($trans, $paid_invoices);
     }
 
