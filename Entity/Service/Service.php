@@ -62,11 +62,6 @@ class Service
      * @ORM\ManyToMany(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", mappedBy="services")
      */
     private $contracts;
-    /**
-     * @var string
-     * @ORM\Column(name="tag", type="string", length=255)
-     */
-    private $tag;
     
     public function __construct() {
         //parent::__construct();
@@ -137,6 +132,7 @@ class Service
     {
         return $this->kod;
     }
+
     /**
      * Set name
      *
@@ -159,28 +155,7 @@ class Service
     {
         return $this->name;
     }
-        /**
-     * Set name
-     *
-     * @param string $name
-     * @return Service
-     */
-    public function setTag($tag)
-    {
-        $this->tag = $tag;
-    
-        return $this;
-    }
 
-    /**
-     * Get name
-     *
-     * @return string 
-     */
-    public function getTag()
-    {
-        return $this->tag;
-    }
     /**
      * Set price
      *
