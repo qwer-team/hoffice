@@ -16,7 +16,7 @@ use Itc\AdminBundle\Tools\LanguageHelper;
 use Itc\AdminBundle\ItcAdminBundle;
 use Itc\DocumentsBundle\Entity\Pd\Pdl;
 use HOffice\AdminBundle\Form\Invoice\EditInvoiceType;
-//use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
+use HOffice\AdminBundle\Form\Invoice\MetersEditInvoiceType;
 use HOffice\AdminBundle\Entity\Service\Service;
 use Doctrine\Common\Collections;
 /**
@@ -69,7 +69,6 @@ class InvoiceController extends Controller
      */
     public function сlosedMonthAction(Request $request){
         
-        echo "wow";
         $em = $this->getDoctrine()->getManager();
         $locale =  LanguageHelper::getLocale();
 
@@ -254,22 +253,29 @@ class InvoiceController extends Controller
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
         $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
-                       ->find($entity->getContractId());
+                     ->find($entity->getContract()->getId());
         $entity->setContract($contract);
         $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
         $entity->setPdtype($pdtype);
         $entity->setSumma1(0);
-        $entity->setSumma2(0);
-        
-        
         if ($form->isValid()) 
         {
             $em->persist($entity);
-
+            
+            $services = $entity->getContract()->getServices();
+            foreach($services as $service)
+            {
+                $pdline = new Pdl();
+                $pdline->setPd($entity);
+                $pdline->setOa1($service->getId());
+                $em->persist($pdline);
+                
+            }
             $em->flush();
-            return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
+            
+           return $this->redirect($this->generateUrl('invoice_edit', array('id' => $entity->getId())));
         }else{
-            print_r($form->getErrors());
+            print_r($form->getErrorsAsString());
         }
         
         $languages  = LanguageHelper::getLanguages();
@@ -277,7 +283,6 @@ class InvoiceController extends Controller
         $context = ItcAdminBundle::getContainer();
         $usr = $context->get('security.context')->getToken()->getUser()->getUserName();
         $date = date("d/m/Y");
-        
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
@@ -297,7 +302,6 @@ class InvoiceController extends Controller
     public function editAction($id)
     {
         $em = $this->getDoctrine()->getManager();
-
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
         
         /*$oldInvoice = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')
@@ -311,32 +315,60 @@ class InvoiceController extends Controller
                      ->setMaxResults( 1 )
                      ->getQuery()
                      ->getOneOrNullResult();*/
-        //echo 'year = '.$entity->getDate();
-       /* $rest = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
-                    ->createQueryBuilder( "R" )
-                    ->select('R')
-                    ->where( 'R.l1 = :contractid')
-                    ->setParameter( 'contractid', $entity->getContract( )->getId())
-                    ->andWhere( "R.y < :year")
-                    ->setParameter( 'year', $entity->getDate('Y'))*/
+        $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
+        $rests = $repo->find( 2, array('l1'=>$entity->getContract( )->getId()), $entity->getDate()->format('Y'), $entity->getDate()->format('m') );
+        echo 'Y = '.$entity->getDate()->format('Y').'<br>';
+        echo 'M = '.$entity->getDate()->format('m').'<br>';
+        echo 'Cont = '.$entity->getContract( )->getId().'<br>';
+        //echo 'obj = '.is_object($rests).'<br>';
+       // echo 'count = '.count($rests);
+//        $rests = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
+//                    ->createQueryBuilder( "R" )
+//                    ->select('R')
+//                    ->where( 'R.l1 = :contractid')
+//                    ->setParameter( 'contractid', $entity->getContract( )->getId())
+//                    ->andWhere( "R.y = :year")
+//                    ->setParameter( 'year', )
+//                    ->andWhere( "R.m = :month")
+//                    ->setParameter( 'month', )
+//                    ->orderBy('R.l2')
+//                    ->getQuery()
+//                    ->execute();
+        
         $services = $entity->getContract()->getServices();
         
-        /*$pdlines = new Collections\ArrayCollection();
+        //$pdlines = new Collections\ArrayCollection();
         
-        if(count($oldInvoice->getPdlines())<=0)
-        {
-            foreach( $oldInvoice->getPdlines() as $pdline )
-            {
-                $pdlines->set( $pdline->getOa1(), $pdline );
-            }
-        }*/
-
+        //if(count($entity->getPdlines())<=0)
+       // {
+//            foreach($services as $service)
+//            {
+//                //$pdlines->set( $pdline->getOa1(), $pdline );
+//                $create_new = true;
+//                foreach( $entity->getPdlines() as $pdl ){
+//                    if($service->getId() == $pdl->getOa1()){
+//                        $create_new = false;
+//                        }
+//                }
+//                if($create_new){
+//                    $pdline1 = new Pdl; 
+//                    //$pdline1->setPdid($entity->getId());
+//                    $pdline1->setOa1($service->getId());
+//                    foreach ($rests as $rest) {
+//                        if($rest->getL2()==$service->getId()){
+//                            $pdline1->setSumma2($rest->getSd());
+//                        }
+//                    }
+//                    //$pdlines->set( $pdline1->getOa1(), $pdline1 );
+//                    $entity->getPdlines()->add( $pdline1 );
+//                }
+//            }//$entity->getPdlines()->add( $pdlines);
+//        //}
         
         
         
         
-        
-        
+//        
 //        foreach( $services as $service ){
 //            $true = false;
 //            foreach( $entity->getPdlines() as $pdl ){
@@ -370,16 +402,28 @@ class InvoiceController extends Controller
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
         
+        
+       // $pdline1 = new Collections\ArrayCollection();
+        
+       // foreach ($services as $service) {
+       //      $search_form[] = $this->createForm(new MetersEditInvoiceType($service))->createView();
+       // }
+        
+        
+        
+        
+       
         $editForm = $this->createForm(new EditInvoiceType(),$entity);
 
         return array(
-            'entity'      => $entity,
-            'sale' => $entity->getContract()->getSale(),
+           // 'search_form'   => $search_form,
+            'rests'         => $rests,
+            'entity'        => $entity,
+            'sale'          => $entity->getContract()->getSale(),
             'services'      => $services,
-            'edit_form'   => $editForm->createView(),
-            
-           // 'meters_edit_form'   => $servForm->createView(),
-            //'delete_form' => $deleteForm->createView(),
+            'edit_form'     => $editForm->createView(),
+            // 'meters_edit_form'   => $servForm->createView(),
+            // 'delete_form' => $deleteForm->createView(),
         );
     }
 

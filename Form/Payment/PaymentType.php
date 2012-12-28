@@ -20,11 +20,9 @@ class PaymentType extends AbstractType
 //            ->add('summa3')
 //            ->add('ucor')
 //            ->add('dtcor', 'genemu_jquerydate')
-//            ->add('oa1')
-//            ->add('oa2')
-//            ->add('txt1')
-//            ->add('txt2')
-//            ->add('pdtype')
+            ->add('contract')
+            ->add('invoice')
+            ->add('pdtype')
         ;
     }
 

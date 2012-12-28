@@ -23,18 +23,25 @@ class Invoice extends Pd{
      */
     private $contract_id;
     /**
-     * @ORM\ManyToOne
-     * (
-     *      targetEntity="HOffice\AdminBundle\Entity\Contract\Contract"
-     * )
-     * @ORM\JoinColumn
-     * (
-     *      name="contract_id", 
-     *      referencedColumnName="id"
-     * )
+     * @Assert\NotNull()
+     * @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=true)
+     * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", inversedBy="invoice")
      */
     private $contract;
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="HOffice\AdminBundle\Entity\Payment\Payment",
+     *     mappedBy="invoice",
+     *     cascade={"persist"}
+     * )
+     */
+    private $payments;
    
+    public function __construct() {
+        $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
+        parent::__construct();
+    }
+    
     public function getContract() {
         return $this->contract;
     }
@@ -51,9 +58,22 @@ class Invoice extends Pd{
     public function setContractId($contract_id) {
         $this->contract_id = $contract_id;
     }
-    /** @ORM\PostLoad */
+    public function  setPayments($payment)
+    {
+        $this->payments[] = $payment;
+    }
+    public function  getPayments()
+    {
+        return $this->payments;
+    }   
+  /** @ORM\PostLoad */
     public function resetContactId()
     {
         $this->contract_id = $this->getContractId();
-    }
+    }    
+    /** @ORM\PostUpdate() */
+    public function createTransaction(){
+        echo "qqq";
+    }    
+
 }

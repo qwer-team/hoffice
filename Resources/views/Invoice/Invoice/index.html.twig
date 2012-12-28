@@ -76,7 +76,7 @@
     <thead>
         <tr>
             <th>Id</th>
-            <th>Pdtype_id</th>
+            <th>Pdtype</th>
             <th>N</th>
             <th>Date</th>
             <th>Status</th>
@@ -96,7 +96,7 @@
     {% for entity in entities %}
         <tr>
             <td><a href="{{ path('invoice_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-            <td>{{ entity.pdtype_id }}</td>
+            <td>{{ entity.pdtype}}</td>
             <td>{{ entity.N }}</td>
             <td>{% if entity.date %}{{ entity.date|date('Y-m-d H:i:s') }}{% endif %}</td>
             <td>{{ entity.status }}</td>

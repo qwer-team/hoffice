@@ -9,6 +9,16 @@ use Doctrine\ORM\EntityRepository;
 
 class MetersEditInvoiceType  extends AbstractType
 {
+    /**
+     *
+     * @var Doctrine\ORM\EntityManager 
+     */
+    private $services;
+    public function __construct($services)
+    {
+        $this->services = $services;
+        
+    }
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /*$qb = $this->em->getRepository('HOfficeAdminBundle:House\Apartment')
@@ -16,15 +26,11 @@ class MetersEditInvoiceType  extends AbstractType
                                     ->where("a.house = :house_id")
                                     ->setParameter("house_id", $this->house_id)
                                     ->orderBy('a.name', 'ASC'); */
-        $disable = array( 'disabled'=>'disabled' );
         $builder
-         			 	 	 
+            //->add('current', 'integer', array('required'=>NULL))    ;	 
             ->add('id')
-            ->add('unit')
-            ->add('kod')
             ->add('name')
-            ->add('price')
-            ->add('price1');	 
+            ;	 
 //            
 //                    ->add( "pdlines", 'collection', 
 //                array(

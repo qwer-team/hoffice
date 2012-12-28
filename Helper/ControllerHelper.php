@@ -240,7 +240,7 @@ class ControllerHelper extends Controller{
      * @param int $id
      * @return object form
      */
-    private function createDeleteForm( $id ){
+    protected function createDeleteForm( $id ){
 
         return $this->createFormBuilder( array( 'id' => $id ) )
             ->add('id', 'hidden')
