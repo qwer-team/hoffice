@@ -30,10 +30,16 @@
             {{ form_row( form.N  ) }}
         </div>
         <div class = 'fl'>
-            {{ form_row( form.contract ) }}
-            <input type="hidden" class='loadContractData'
-                    data-link=".loadContractData"
-                    data-route="ajax_data_from_contract" />  
+            {{ form_row( form.contract_id)}}
+            Contract <input type="text" class="entity_search enter_contract" 
+                    data-link=".search_contract_id"
+                    data-type-link="input"
+                    data-route="ajax_search_contract"
+                    data-after-search=".loadContractData" />
+              <input type="hidden" class='loadContractData'
+                    data-link=".search_contract_id"
+                    data-route="ajax_data_from_contract" /> 
+            
         </div>
         <div class="clear"></div>
         <br class = 'clr' />
@@ -51,127 +57,12 @@
             <tbody>
             </tbody>
         </table>
-    
-    
-    
-    
-{#------------------------------------------------------------------------------   
-        <div class="clear"></div>
-        <div>
-            <input type="hidden" class='search_contract_id' />
-            № Contr <input type="text" class="entity_search w100pr contract_data" 
-                    data-link=".loadContractData"
-                    data-type-link="input"
-                    data-route="ajax_search_contract"
-                    data-after-search=".loadContractData" />
-            <input type="hidden" class='loadContractData'
-                    data-link=".loadContractData"
-                    data-type-link="input"
-                    data-route="ajax_data_from_contract" />  
-        </div>
-------------------------------------------------------------------------------#}
-             
-            
-         {# <div class = 'fl'>
-           {{ form_row( form.pdtype ) }}
-        </div>
-       <div class = 'fl'>
-            {{ form_row( form.oa2 ) }}
-        </div>
-        <div class = 'fl'>
-           {{ form_row( form.txt1  ) }}
-        </div>
-        <div class = 'fl'>
-            {{ form_row( form.txt2 ) }}
-        </div>
-        <div class = 'fl'>
-            {{ form_row( form.summa1 ) }}
-        </div>
-        <div class = 'fl'>
-           {{ form_row( form.summa2 ) }}
-        </div>
-        <div class = 'fl'>
-           {{ form_row( form.summa3 ) }}
-        </div>
-            
 
-        #}
     </div>
         
     <br class = 'clr' />
     <hr />
 
-{#------------------------------------------------------------------------------       
-    
-    <table class="records_list counters">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Tariff</th>
-                <th>Current indicators</th>
-                <th>Previous indicators</th>
-                <th>Delta</th>
-                <th>Zumma</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td>All:</td>
-                <td id="all"></td>
-            </tr>
-        </tfoot>
-    </table>
-    <div hidden="hidden" id='err1'>Some error</div>
-        <br class = 'clr' />
-    <hr />
-------------------------------------------------------------------------------#}  
-    {#<div class = 'menu_sys_lang_select'>
-
-        {% for language in languages %}
-
-            {% set lang = language %}
-            {% if lang == locale %}{% set current = 'current' %}
-            {% else %}{% set current = '' %}
-            {% endif %}
-            <div class = 'menu_sys_lang_tab {{ current }}' lang = '{{lang}}' rel = '{{lang}}'>
-                {{ lang }}
-            </div>
-
-        {% endfor %}
-
-        <br class = 'clr' />
-
-        <div class = 'menu_sys_content_show'>
-
-        {% for language in languages %}
-
-            {% set lang = language %}
-
-            {% if lang != locale %} 
-                {% set hide = 'hide' %}
-            {% else %}
-                {% set hide = '' %}
-            {% endif %}
-
-            <div class = 'menu_sys_lang_show {{ hide }}' lang = '{{lang}}' rel = '{{lang}}'>
-                 <div>
-                    {% set desc = form[lang~"Translation.title"] %}
-                    {{ form_label(  desc ) }}
-                    {{ form_errors( desc ) }}
-                    {{ form_widget( desc, { 'attr': {'class': 'menu_sys_input_edit'} }) }}
-                </div>
-            </div>       
-
-        {% endfor %}
-
-        </div>
-    </div>
-
-    <br class="clr" />
-        
-    {{ form_rest(form) }}#}
 {{ form_rest(form) }}
 
 </form>

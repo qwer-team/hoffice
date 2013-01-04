@@ -26,6 +26,9 @@ use Doctrine\Common\Collections;
  */
 class InvoiceController extends Controller
 {
+    const _pdtypeId = 1;
+    const _metersAccId = 2;
+
     /**
      * Lists all Invoice\Invoice entities.
      *
@@ -35,7 +38,7 @@ class InvoiceController extends Controller
      * @Template()
      */    
     public function indexAction($coulonpage = 100, $page)
-    {
+    {        
         $em = $this->getDoctrine()->getManager();
         $locale =  LanguageHelper::getLocale();
         
@@ -252,12 +255,13 @@ class InvoiceController extends Controller
         $entity  = new Invoice();
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
-        $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
-                     ->find($entity->getContract()->getId());
+        
+        $contract=$em->getRepository("HOfficeAdminBundle:Contract\Contract")->find($entity->getContractId());
         $entity->setContract($contract);
-        $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
+        
+        $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(self::_pdtypeId);
         $entity->setPdtype($pdtype);
-        $entity->setSumma1(0);
+        $entity->setSumma1(0);  
         if ($form->isValid()) 
         {
             $em->persist($entity);
@@ -316,12 +320,10 @@ class InvoiceController extends Controller
                      ->getQuery()
                      ->getOneOrNullResult();*/
         $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
-        $rests = $repo->find( 2, array('l1'=>$entity->getContract( )->getId()), $entity->getDate()->format('Y'), $entity->getDate()->format('m') );
-        echo 'Y = '.$entity->getDate()->format('Y').'<br>';
-        echo 'M = '.$entity->getDate()->format('m').'<br>';
-        echo 'Cont = '.$entity->getContract( )->getId().'<br>';
+        $rests = $repo->find( self::_metersAccId , array('l1'=>$entity->getContract( )->getId()), $entity->getDate()->format('Y'), $entity->getDate()->format('m') );
+
         //echo 'obj = '.is_object($rests).'<br>';
-       // echo 'count = '.count($rests);
+//      echo 'count = '.count($rests);
 //        $rests = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
 //                    ->createQueryBuilder( "R" )
 //                    ->select('R')
@@ -409,7 +411,7 @@ class InvoiceController extends Controller
        //      $search_form[] = $this->createForm(new MetersEditInvoiceType($service))->createView();
        // }
         
-        
+        $price = generatePrice($entity->getDate()->format('Y-m-d'), $services->getPrice(), $services->getPrice1(), $entity->getStatus());
         
         
        
@@ -419,13 +421,19 @@ class InvoiceController extends Controller
            // 'search_form'   => $search_form,
             'rests'         => $rests,
             'entity'        => $entity,
-            'sale'          => $entity->getContract()->getSale(),
+            'price'         => $price,
             'services'      => $services,
             'edit_form'     => $editForm->createView(),
             // 'meters_edit_form'   => $servForm->createView(),
             // 'delete_form' => $deleteForm->createView(),
         );
     }
+    
+    private function generatePrice($dateCreate, $price, $price1, $sale, $status){
+        
+        return $services;
+    }
+    
 
     /**
      * Edits an existing Invoice\Invoice entity.

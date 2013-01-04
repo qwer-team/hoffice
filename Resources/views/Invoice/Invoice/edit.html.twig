@@ -68,7 +68,7 @@
                 <tr>
                     <td>{{service.id}}</td>
                     <td>{{service.name}}</td>
-                    <td>price:{{service.price}}<br>price1:{{service.price1}}<br>sale:{{sale}}</td>
+                    <td>price:{{service.price}}<br>price1:{{service.price1}}</td>
                        {#% for pdline in edit_form.pdlines %}                    
                             {% if  service.id == pdline.oa1.get('value') %#}
                             <td> 
