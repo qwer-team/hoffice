@@ -10,7 +10,7 @@ use Itc\DocumentsBundle\Entity\Pd\RestRepository;
  *
  * @author root
  */
-class Service {
+class PaymentService {
     
     private $service;
     private $payment;
@@ -40,6 +40,7 @@ class Service {
     
 
     function __construct($payment = null, $container = null) {
+        
         $this->payment = $payment;
         $this->container = \Itc\AdminBundle\ItcAdminBundle::getContainer();//$container;
         list($this->y, $this->m) = explode(",", 
@@ -80,9 +81,26 @@ class Service {
         $invoice_sum = $rest_invoice > 0 ? $rest_invoice : 0 ;
         $payment_sum = $this->payment->getSumma1();
         
+        if ($payment_sum < $invoice_sum)
+        {
+            if ( !isset($this->balance) )
+                $this->balance =  $this->getRestData(self::rest_total, 
+                    array("l1" => $this->contract->getId(),
+                          "l2" => NULL,
+                          "l3" => NULL,
+                         ));            
+            
+            $differens = $invoice_sum - $payment_sum;
+            if ( $this->balance < 0 )
+                $payment_sum += $difference > abs( $this->balance ) ? 
+                               abs( $this->balance ) : 
+                               abs( $this->balance ) - $difference ;
+        }
+        
         if ($payment_sum >= $invoice_sum)
         {
             $this->invoice->setStatus(self::pd_paid);
+            
         }
         
         if ($payment_sum > $invoice_sum)
@@ -205,7 +223,7 @@ class Service {
     {
         $create = $event->getCreate();
         
-        $this->service = new Service($create);
+        $this->service = new PaymentService($create);
         $this->service->execute();
         
     }
@@ -235,17 +253,19 @@ class Service {
     private function expandRestSum( $sum, $difference )
     {
         $em = $this->container->get("doctrine")->getEntityManager();
-        $this->balance =  $this->getRestData(self::rest_total, 
-            array("l1" => $this->contract->getId(),
-                  "l2" => NULL,
-                  "l3" => NULL,
-                 ));
         
-        $this->balance -= $sum;
+        if ( !isset($this->balance) )
+            $this->balance =  $this->getRestData(self::rest_total, 
+                array("l1" => $this->contract->getId(),
+                      "l2" => NULL,
+                      "l3" => NULL,
+                     ));
+        
+        $total_balace = $this->balance - $sum;
         $trans = array();
         $paid_invoices = array();
         
-        if ($this->balance > 0)
+        if ($total_balace > 0)
         {
             
             $repo = $em->getRepository("HOfficeAdminBundle:Invoice\Invoice");
@@ -280,6 +300,7 @@ class Service {
                 $this->createTransForPayment( $invoice->getId(), $invoice_sum );  
                 
                 }
+                else continue;                
             }
                 
         }

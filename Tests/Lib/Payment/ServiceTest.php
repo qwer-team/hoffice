@@ -5,7 +5,7 @@ use Itc\AdminBundle\Tools\KernelAwareTest;
 use HOffice\AdminBundle\Entity\Payment\Payment;
 use HOffice\AdminBundle\Entity\Invoice\Invoice;
 use HOffice\AdminBundle\Entity\Contract\Contract;
-use HOffice\AdminBundle\Lib\Payment\Service;
+use HOffice\AdminBundle\Lib\Payment\PaymentService;
 use Itc\DocumentsBundle\Entity\Pd\Trans;
 
 class ServiceTest extends KernelAwareTest 
@@ -70,7 +70,7 @@ class ServiceTest extends KernelAwareTest
         $this->payment->setStatus(2);
         $this->payment->setInvoice($invoice);
         
-        $this->service = new Service($this->payment, $this->container);
+        $this->service = new PaymentService($this->payment, $this->container);
 
         $param = \Itc\AdminBundle\ItcAdminBundle::getContainer();
         
