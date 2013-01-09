@@ -72,7 +72,7 @@ class Invoice extends Pd{
     }    
     /** @ORM\PostUpdate() */
     public function createTransaction(){
-        echo "qqq";
+        //echo "qqq";
     }    
 
 }

@@ -270,9 +270,6 @@ class PaymentController extends ControllerHelper {
         $y = date("m") == 12 ? date("Y") + 1 : date("Y");
         $m = date("m") == 12 ? 1 : date("m") + 1;
         
-        $restPd = $repo->findOne( 3, array(
-            "l1"=>$contract->getId(), "l2"=>NULL, "l3"=>NULL), $y, $m );
-        echo is_object($restPd) ? $restPd->getSd() : 0;
         return array(
 
             'entity'        => $entity,
