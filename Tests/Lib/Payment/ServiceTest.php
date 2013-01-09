@@ -51,13 +51,13 @@ class ServiceTest extends KernelAwareTest
         $this->entityManager->flush();
         
         $trans[] = array(
-                    'iaccid'  => 1,
+                    'iaccid'  => self::rest_detail,
                     'il1'     => $contract->getId(), 
                     'il2'     => $invoice->getId(), 
                     'il3'     => NULL,
                     'summa'   => 100 );
         $trans[] = array(
-                    'iaccid'  => 3,
+                    'iaccid'  => self::rest_total,
                     'il1'     => $contract->getId(), 
                     'il2'     => NULL, 
                     'il3'     => NULL,
@@ -70,9 +70,9 @@ class ServiceTest extends KernelAwareTest
         $this->payment->setStatus(2);
         $this->payment->setInvoice($invoice);
         
-        $this->service = new PaymentService($this->payment, $this->container);
+        $this->service = new PaymentService($this->payment);
 
-        $param = \Itc\AdminBundle\ItcAdminBundle::getContainer();
+   //     $param = \Itc\AdminBundle\ItcAdminBundle::getContainer();
         
         if ( !isset($this->y) || !isset($this->m))
             list($this->y, $this->m) = explode(",", 
@@ -96,8 +96,9 @@ class ServiceTest extends KernelAwareTest
         
         $this->service->execute();
         
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 2);
-        $this->assertEquals( $this->payment->getStatus(), 2);
+        $this->assertEquals( $this->payment->getInvoice()->getStatus(),
+                                                                self::pd_paid);
+        $this->assertEquals( $this->payment->getStatus(), self::pd_paid);
         
         $total = $this->payment->getInvoice()->getSumma1() - 
                 $this->payment->getSumma1();
@@ -127,8 +128,9 @@ class ServiceTest extends KernelAwareTest
         
         $this->service->execute();
         
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 1);
-        $this->assertEquals( $this->payment->getStatus(), 2);
+        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 
+                                                            self::pd_not_paid);
+        $this->assertEquals( $this->payment->getStatus(), self::pd_paid);
         
         $total = $this->payment->getInvoice()->getSumma1() - 
                 $this->payment->getSumma1();
@@ -158,8 +160,9 @@ class ServiceTest extends KernelAwareTest
         
         $this->service->execute();
         
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 2);
-        $this->assertEquals( $this->payment->getStatus(), 2);
+        $this->assertEquals( $this->payment->getInvoice()->getStatus(),
+                                                                self::pd_paid);
+        $this->assertEquals( $this->payment->getStatus(), self::pd_paid);
         
         $total = $this->payment->getInvoice()->getSumma1() - 
                 $this->payment->getSumma1();
@@ -199,9 +202,10 @@ class ServiceTest extends KernelAwareTest
         
         $this->service->execute();
         
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 2);
-        $this->assertEquals( $second_invoice->getStatus(), 2);
-        $this->assertEquals( $this->payment->getStatus(), 2);
+        $this->assertEquals( $this->payment->getInvoice()->getStatus(),
+                                                                self::pd_paid);
+        $this->assertEquals( $second_invoice->getStatus(), self::pd_paid);
+        $this->assertEquals( $this->payment->getStatus(), self::pd_paid);
         
         $total = $total_invoices - $this->payment->getSumma1();
         

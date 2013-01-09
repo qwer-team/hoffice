@@ -2,7 +2,7 @@
 
 namespace HOffice\AdminBundle\Lib\Balance;
 use HOffice\AdminBundle\Entity\Payment\Payment;
-
+use HOffice\AdminBundle\Entity\Invoice\Invoice;
 /**
  * Description of BalanceService
  *
@@ -10,6 +10,8 @@ use HOffice\AdminBundle\Entity\Payment\Payment;
  */
 class BalanceService {
     
+    private $entityManager;
+    private $contacts;
     private $m;
     private $y;    
     /**
@@ -27,10 +29,16 @@ class BalanceService {
     /**
      * Статус неоплаченного документа
      */
-    const pd_not_paid = 1;    
+    const pd_not_paid = 1; 
+    /**
+     * Статус нового дукумента
+     */
+    const pd_new = 0;
     
-    function __construct( $container = null ) {
+    
+    function __construct( /*$contracts = null*/ ) {        
         
+        //$this->contracts = $contracts;
         $this->container = \Itc\AdminBundle\ItcAdminBundle::getContainer();
         list($this->y, $this->m) = explode(",", 
             date("Y,m", mktime(0, 0, 0, date("n") + 1)));
@@ -38,26 +46,69 @@ class BalanceService {
     
     public function execute()
     {
-        $em = $this->container->get("doctrine")->getEntityManager();                       
-
-        echo "eee";
-    }
-
+        echo "ata";
+        $this->entityManager = $this->container->get("doctrine")->getEntityManager(); 
+        
+        $this->paymentNotClosedInvoices();
+//        $this->recalculationInvoices();
+        $this->createNewInvoices();
+    }    
     public function onCreateBalanceMonth( $event )
     {
         $balance_month = new BalanceService();
         $balance_month->execute();
     }
-    
-    private function paymentNotClosedInvoices()
+    /**
+     * Создание новых квитанций
+     */
+    private function createNewInvoices()
     {
-        $invoices = $em->getRepository("HOfficeAdminBundle:Invoice\Invoice")
-                       ->findBy(array('status' => 1)
+        $contracts = $this->entityManager
+                        ->getRepository("HOfficeAdminBundle:Contract\Contract")
+                        ->findAll();
+        foreach ( $contracts as $contract )
+        {
+            $new_invoice = new Invoice();
+//                $sum = $this->calculateInvoiceSum($contract->getId());
+            $sum = 100;
+            $new_invoice->setN(1);
+            $new_invoice->setSumma1( $sum );
+            $new_invoice->setSumma2(0);
+            $new_invoice->setSumma3(0);
+            $new_invoice->setStatus( self::pd_new );
+            $new_invoice->setContract( $contract );
+            $this->entityManager->persist($new_invoice);
+        }
+        $this->entityManager->flush();
+        //$this->enti
+    }
+
+    /**
+     * Перерасчет квитанций
+     */
+    private function recalculationInvoice( $invoice )
+    {
+/*        $invoices = $this->entityManager
+                         ->getRepository("HOfficeAdminBundle:Invoice\Invoice")
+                         ->findBy(array('status' => 1)
+                               );        */
+        
+    }
+
+    /**
+     * Закрытие неоплаченых квитанций
+     */
+    private function paymentNotClosedInvoices()
+    {           
+        $invoices = $this->entityManager
+                         ->getRepository("HOfficeAdminBundle:Invoice\Invoice")
+                         ->findBy(array('status' => 1)
                                );
         
         foreach( $invoices as $invoice )
-        {
-            $repo = $em->getRepository("ItcDocumentsBundle:Pd\Rest");        
+        {echo "aha";
+            $repo = $this->entityManager
+                         ->getRepository("ItcDocumentsBundle:Pd\Rest");        
             
             $rest_contract = $repo->findOne( self::rest_detail , 
                                 array('l1' => $invoice->getContract()->getId(),
@@ -81,11 +132,15 @@ class BalanceService {
                 $payment->setInvoice($invoice);
                 $payment->setSumma1($payment_sum);
                 $payment->setStatus(self::pd_paid);
-                $em->persist( $payment );
+                $this->entityManager->persist( $payment );
             
             }
+            else
+            {
+                $this->recalculationInvoice( $invoice );
+            }
         }
-        $em->flush();
+        $this->entityManager->flush();
     }
     
 }

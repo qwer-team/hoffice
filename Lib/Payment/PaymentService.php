@@ -39,7 +39,7 @@ class PaymentService {
     const pd_not_paid = 1;
     
 
-    function __construct($payment = null, $container = null) {
+    function __construct($payment = null) {
         
         $this->payment = $payment;
         $this->container = \Itc\AdminBundle\ItcAdminBundle::getContainer();//$container;
