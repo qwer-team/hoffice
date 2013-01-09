@@ -12,6 +12,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use HOffice\AdminBundle\Entity\Payment\Payment;
 use HOffice\AdminBundle\Form\Payment\PaymentType;
 use HOffice\AdminBundle\Form\Payment\SearchPaymentType;
+use HOffice\AdminBundle\Form\Payment\BalanceMonthType;
+use HOffice\AdminBundle\Event\BalanceMonthEvent;
 
 use HOffice\AdminBundle\Helper\ControllerHelper;
 
@@ -31,16 +33,21 @@ class PaymentController extends ControllerHelper {
      * @Route(
      *  "/{coulonpage}/{page}", name="payment",
      *      requirements={"coulonpage" = "\d+", "page" = "\d+"}, 
-     *      defaults={ "coulonpage"="10", "page"=1 } 
+     *      defaults={ "coulonpage"="100", "page"=1 } 
      * )
      * @Template()
      */
-    public function indexAction( $coulonpage = 10, $page ) {
+    public function indexAction( Request $request = NULL,
+                                                $coulonpage = 100, $page ) {
 
         $em = $this->getDoctrine()->getManager();
 
-        $rest = $em->getRepository('Itc\DocumentsBundle\Entity\Pd\Rest')
-                   ->find(1, array( "l1" => 1 ), "2012", "1:10" );
+        $form = $this->createBalanceMonthForm();
+        $form->bind($request);
+        
+        if ($form->isValid()) {
+            $ballance_message = $this->createBalanceMonthEvent();           
+        }
 
         $select = "SUM( P.summa1 ) AS summa1, 
                    SUM( P.summa2 ) AS summa2, 
@@ -56,7 +63,10 @@ class PaymentController extends ControllerHelper {
         $page     = $this->get('request')->query->get( 'page', $page );
         $entities = $this->get('knp_paginator')
                          ->paginate( $this->getQbAllJoins(), $page, $coulonpage );
-
+//        $balance_form = $this->createForm( new BalanceMonthType( ) );
+        
+        $balance_form = $this->createBalanceMonthForm();
+        
         return array(
 
             'summa'       => $summa,
@@ -67,7 +77,8 @@ class PaymentController extends ControllerHelper {
             'search_form' => $search_form->createView(),
             'delete_form' => $this->getDeleteForm( $entities ),
             'coulonpage'  => $coulonpage,
-
+            'balance_form' => $balance_form->createView(),
+            'ballance_message' => $ballance_message
         );
 
     }
@@ -297,6 +308,18 @@ class PaymentController extends ControllerHelper {
                     ->getForm();
 
     }
+    /**
+     * 
+     * @param type $entity
+     * @return type
+     */
+    private function createBalanceMonthForm( ){
+
+        return  $this->createFormBuilder( )
+                    ->add( 'approve', 'hidden' )
+                    ->getForm();
+
+    }
     
     /**
      * Edits an existing Menu entity.
@@ -435,6 +458,25 @@ class PaymentController extends ControllerHelper {
     public function deletePaymentAjaxAction( Request $request, $id )
     {
         $this->deleteEntityById( $id,  $this->payment, $request );
+    }
+    private function createBalanceMonthEvent(){
+                
+        $em = $this->getDoctrine()->getManager();
+
+        $invoices = $em->getRepository("HOfficeAdminBundle:Invoice\Invoice")
+                       ->findBy(array('status' => 0)
+                               );
+        if (count($invoices) > 0) 
+            return "Невозможно закрыть месяц! Есть незакрытые квитанции.";
+        
+        $dispatcher = $this->get("event_dispatcher");
+        $event = new BalanceMonthEvent(true);
+        $dispatcher->dispatch("balance_month.create_event", $event);        
+/*        foreach($invoices as $invoice)
+            echo $invoice->getN()."===".$invoice->getId();
+  */      
+        return "Месяц закрыт!";
+
     }
     
 }
