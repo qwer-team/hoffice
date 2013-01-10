@@ -5,3 +5,9 @@ services:
             - { name: kernel.event_listener, event: payment.update_trans, method: onPaymentUpdateTrans }  
 imports:
     - { resource: addParameters.yml }      
+fos_user:
+    db_driver: orm 
+    firewall_name: main
+    user_class: HOffice\AdminBundle\Entity\User
+    group:
+      group_class: Itc\AdminBundle\Entity\Group
