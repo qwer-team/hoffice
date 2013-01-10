@@ -6,39 +6,48 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Doctrine\ORM\EntityRepository;
-
+use HOffice\AdminBundle\Form\Invoice;
 class MetersEditInvoiceType  extends AbstractType
 {
-    /**
-     *
-     * @var Doctrine\ORM\EntityManager 
-     */
-    private $services;
-    public function __construct($services)
+
+    private $serviceM;
+    private $closed;
+    
+    public function __construct( $serviceM = NULL, $closed)
     {
-        $this->services = $services;
-        
+        $this->serviceM = $serviceM;
+        $this->closed= $closed;
     }
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /*$qb = $this->em->getRepository('HOfficeAdminBundle:House\Apartment')
-                                    ->createQueryBuilder('a')
-                                    ->where("a.house = :house_id")
-                                    ->setParameter("house_id", $this->house_id)
-                                    ->orderBy('a.name', 'ASC'); */
-        $builder
-            //->add('current', 'integer', array('required'=>NULL))    ;	 
-            ->add('id')
-            ->add('name')
-            ;	 
-//            
+       // $builder
+       //     ->add('summa1', 'hidden', array('required'=>NULL));
+       
+        if($this->serviceM)
+        {
+            if($this->closed)
+            $builder
+                ->add('summa2','integer', array( 'disabled'=>'disabled' ));
+            else{
+        }           $builder
+                ->add('summa2','integer');
+         
+        }
+                
+        
+        
+//        
+//        
+//            $builder
 //                    ->add( "pdlines", 'collection', 
 //                array(
-//                    'type'         => new PdlReversalType(),
+//                    'type'         => new Itc\DocumentsBundle\Form\Pd\PdlReversalType,
 //                    'allow_add'    => true,
 //                    'allow_delete' => true,
 //                    'by_reference' => true,
 //                ) );
+            
+            
 //        ->add('id') 	->add('user_id') 	->add('apartment_id') 	->add('kod') 	->add('serial_number') 	->add('title') 	->add('registered') 	->add('sale');
 //            ->add('N')
 //            ->add('date','date', $disable )
@@ -53,6 +62,13 @@ class MetersEditInvoiceType  extends AbstractType
 //            ->add('name_ucor',null, $disable )
 //            ->add('dtcor','date', $disable );
 
+    }
+    
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => 'Itc\DocumentsBundle\Entity\Pd\Pdl'
+        ));
     }
 
     public function getName()
