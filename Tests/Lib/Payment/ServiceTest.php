@@ -4,259 +4,93 @@ namespace HOffice\AdminBundle\Tests\Lib\Payment;
 use Itc\AdminBundle\Tools\KernelAwareTest;
 use HOffice\AdminBundle\Entity\Payment\Payment;
 use HOffice\AdminBundle\Entity\Invoice\Invoice;
-use HOffice\AdminBundle\Entity\Contract\Contract;
-use HOffice\AdminBundle\Lib\Payment\PaymentService;
-use Itc\DocumentsBundle\Entity\Pd\Trans;
+use HOffice\AdminBundle\Lib\Payment\Service;
 
 class ServiceTest extends KernelAwareTest 
 {
     private $service;
     private $payment;
-    private $m;
-    private $y;
-    /**
-     * Регистр взаиморасчёта с детализацией по документу
-     */
-    const rest_detail = 1; 
-    /**
-     * Регистр взаиморасчёта общий
-     */
-    const rest_total = 3;
-    /**
-     * Статус оплаченого документа
-     */
-    const pd_paid = 2;
-    /**
-     * Статус неоплаченного документа
-     */
-    const pd_not_paid = 1;
-
+    
     public function setUp() {
         parent::setUp();
-        $contract = new Contract();
-        $contract->setUserId(1);
-        $contract->setApartmentId(5);
-        $contract->setKod(1);
-        $contract->setRegistered(5);
-        $this->entityManager->persist($contract);
-        
         $invoice = new Invoice();
         $invoice->setN(1);
+        $invoice->setContractId(1);
         $invoice->setSumma1(100);
-        $invoice->setSumma2(0);
-        $invoice->setSumma3(0);
-        $invoice->setStatus(1);
-        $invoice->setContract($contract);
+        $invoice->setSumma2(1);
+        $invoice->setSumma3(1);
         $this->entityManager->persist($invoice);
-        $this->entityManager->flush();
-        
-        $trans[] = array(
-                    'iaccid'  => 1,
-                    'il1'     => $contract->getId(), 
-                    'il2'     => $invoice->getId(), 
-                    'il3'     => NULL,
-                    'summa'   => 100 );
-        $trans[] = array(
-                    'iaccid'  => 3,
-                    'il1'     => $contract->getId(), 
-                    'il2'     => NULL, 
-                    'il3'     => NULL,
-                    'summa'   => 100 );        
-        $this->createTrans($invoice, $trans );        
-        $this->entityManager->flush();
+        $this->entityManager->flush($invoice);
         
         $this->payment = new Payment();
         $this->payment->setN(1);
-        $this->payment->setStatus(2);
+        $this->payment->setStatus(1);
         $this->payment->setInvoice($invoice);
         
-        $this->service = new PaymentService($this->payment, $this->container);
-
-        $param = \Itc\AdminBundle\ItcAdminBundle::getContainer();
-        
-        if ( !isset($this->y) || !isset($this->m))
-            list($this->y, $this->m) = explode(",", 
-               date("Y,m", mktime(0, 0, 0, date("n") + 1)));
-    }
-    /*
-     * Проверка когда сумма оплаты == сумма квитанции
-     */
-    public function testSummEqual()
-    {
-        $this->paymentSummas(100, 0, 0);       
-
-        $contract_id = $this->payment->getInvoice()->getContract()->getId();     
-     
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               $this->payment->getInvoice()->getSumma1() );
-        
-        $this->checkTotalRest($contract_id, 
-                              $this->payment->getInvoice()->getSumma1() );
-        
-        $this->service->execute();
-        
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 2);
-        $this->assertEquals( $this->payment->getStatus(), 2);
-        
-        $total = $this->payment->getInvoice()->getSumma1() - 
-                $this->payment->getSumma1();
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               $total );
-        
-        $this->checkTotalRest($contract_id, $total );
-                
-    }
-    /*
-     * Проверка когда сумма оплаты < сумма квитанции
-     */
-    public function testSummLess()
-    {
-        $this->paymentSummas(25, 0, 0);
- 
-        $contract_id = $this->payment->getInvoice()->getContract()->getId();     
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               $this->payment->getInvoice()->getSumma1() );
-        
-        $this->checkTotalRest($contract_id, 
-                              $this->payment->getInvoice()->getSumma1() );
-        
-        $this->service->execute();
-        
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 1);
-        $this->assertEquals( $this->payment->getStatus(), 2);
-        
-        $total = $this->payment->getInvoice()->getSumma1() - 
-                $this->payment->getSumma1();
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               $total );
-        
-        $this->checkTotalRest($contract_id, $total );
-        
-    }
-    /*
-     * Проверка когда сумма оплаты > сумма квитанции
-     */
-    public function testSummMore()
-    {
-        $this->paymentSummas(200, 0, 0);
-
-        $contract_id = $this->payment->getInvoice()->getContract()->getId();     
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               $this->payment->getInvoice()->getSumma1() );
-        
-        $this->checkTotalRest($contract_id, 
-                              $this->payment->getInvoice()->getSumma1() );
-        
-        $this->service->execute();
-        
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 2);
-        $this->assertEquals( $this->payment->getStatus(), 2);
-        
-        $total = $this->payment->getInvoice()->getSumma1() - 
-                $this->payment->getSumma1();
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               0 );
-        
-        $this->checkTotalRest($contract_id, $total );
-        
-    }
-    /*
-     * Проверка когда сумма оплаты > сумма квитанции
-     */
-    public function testSummMoreInvoice()
-    {
-        $this->paymentSummas(300, 0, 0);
-        
-        $second_invoice = $this->createInvoice(
-                            $this->payment->getInvoice()->getContract(), 150);
-        
-        $contract_id = $this->payment->getInvoice()->getContract()->getId();     
-        
-        $total_invoices = $second_invoice->getSumma1() + 
-                        $this->payment->getInvoice()->getSumma1();
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               $this->payment->getInvoice()->getSumma1() );
-
-        $this->checkDetailRest($contract_id, 
-                               $second_invoice->getId(),
-                               $second_invoice->getSumma1() );
-        
-        $this->checkTotalRest($contract_id, 
-                              $total_invoices );
-        
-        $this->service->execute();
-        
-        $this->assertEquals( $this->payment->getInvoice()->getStatus(), 2);
-        $this->assertEquals( $second_invoice->getStatus(), 2);
-        $this->assertEquals( $this->payment->getStatus(), 2);
-        
-        $total = $total_invoices - $this->payment->getSumma1();
-        
-        $this->checkDetailRest($contract_id, 
-                               $this->payment->getInvoice()->getId(),
-                               0 );
-
-        $this->checkDetailRest($contract_id, 
-                               $second_invoice->getId(),
-                               0 );
-        
-        $this->checkTotalRest($contract_id, $total );
-        
+        $this->service = new Service($this->payment, $this->container);
     }
     
-    /**
-     * Проверка Общего регистра по контракту
-     * @param type $contract_id ид контракта
-     * @param type $expected ожидаемое значение
-     */
-    private function checkTotalRest( $contract_id, $expected )
+    public function testSummEqual()
     {
-        $repo = $this->entityManager
-                        ->getRepository("ItcDocumentsBundle:Pd\Rest");
+        $this->paymentSummas(100, 10, 1);
+           
+        $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Rest");
+        $ent = $repo->findAll();
+        $this->assertEquals(0, count($ent));
         
-        $ballance =  $repo->findOne( self::rest_total, 
-                array("l1" => $contract_id,
-                      "l2" => NULL,
-                      "l3" => NULL,
-                      ), $this->y, $this->m );
+        $this->service->execute();
+                      
+        $ent = $repo->findAll();
+        foreach($ent as $n){
+//            \Doctrine\Common\Util\Debug::dump(//"l1=".$n->getL1()."l2=".$n->getL2()."l3=".$n->getL3());
+//            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd()."Iacc=".$n->getAccId());
+        }
+//        \Doctrine\Common\Util\Debug::dump($this->payment);
+//        \Doctrine\Common\Util\Debug::dump($invoice);
+        $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Trans");
+        $trans = $repo->findAll();
+        foreach($trans as $n){
+            \Doctrine\Common\Util\Debug::dump("sum=".$n->getSumma()."iacc=".$n->getIaccId()."oacc=".$n->getOaccId()."pd=".$n->getPd()->getId());
+        }
+  //      $this->assertEquals(1, count($trans));
         
-        $this->assertEquals( $expected, $ballance->getSd() );
-        
+        $this->assertEquals(48, count($ent));
     }
-    /**
-     * Проверка Детализированного регистра по квитанции
-     * @param type $contract_id ид контракта
-     * @param type $pdid ид квитанции
-     * @param type $expected ожидаемое значение
-     */
-    private function checkDetailRest( $contract_id, $pdid, $expected )
+    
+    public function testSummLess()
     {
-        $repo = $this->entityManager
-                        ->getRepository("ItcDocumentsBundle:Pd\Rest");        
+        $this->paymentSummas(50, 5, 1);
+        $this->service->execute();
         
-        $ballance =  $repo->findOne( self::rest_detail, 
-                array("l1" => $contract_id,
-                      "l2" => $pdid,
-                      "l3" => NULL,
-                      ), $this->y, $this->m );
-                
-        $this->assertEquals( $expected, $ballance->getSd() );
+        $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Rest");              
         
+        $ent = $repo->findAll();
+        foreach($ent as $n){
+//            \Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
+        }
+        $this->assertEquals(48, count($ent));
     }
 
+    public function testSummMore()
+    {
+        $this->paymentSummas(200, 10, 1);
+        $this->service->execute();
+        
+        $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Rest");
+              
+        
+        $ent = $repo->findAll();
+        foreach($ent as $n){
+            //\Doctrine\Common\Util\Debug::dump($n->getM()."-".$n->getY()."sd=".$n->getSd()."oc=".$n->getOc()."od=".$n->getOd());
+        }
+/*  
+        $repo = $this->entityManager->getRepository("ItcDocumentsBundle:Pd\Trans");
+        
+        $trans = $repo->findAll();
+        $this->assertEquals(1, count($trans));
+         
+*/        $this->assertEquals(72, count($ent));
+    }
     private function paymentSummas($summa1, $summa2, $summa3)
     {
         $this->payment->setSumma1($summa1);
@@ -265,49 +99,4 @@ class ServiceTest extends KernelAwareTest
         $this->entityManager->persist($this->payment);
         $this->entityManager->flush($this->payment);
     }
-    
-    private function createTrans($pd, $trans)
-    {        
-        foreach( Trans::getTransactions( $pd , $trans ) as $entity )
-        {
-            $this->entityManager->persist( $entity );
-        }
-        
-        $this->entityManager->flush();        
-    }
-    /**
-     * Создание новой квитанции
-     * @param type $contract Объект контракт
-     * @param type $summa сумма квитанции
-     */
-    private function createInvoice($contract, $summa )
-    {
-        $invoice = new Invoice();
-        $invoice->setN('new');
-        $invoice->setSumma1($summa);
-        $invoice->setSumma2(0);
-        $invoice->setSumma3(0);
-        $invoice->setStatus(1);
-        $invoice->setContract($contract);
-        $this->entityManager->persist($invoice);
-        $this->entityManager->flush();
-        
-        $trans[] = array(
-                    'iaccid'  => self::rest_detail,
-                    'il1'     => $contract->getId(), 
-                    'il2'     => $invoice->getId(), 
-                    'il3'     => NULL,
-                    'summa'   => $summa );
-        $trans[] = array(
-                    'iaccid'  => self::rest_total,
-                    'il1'     => $contract->getId(), 
-                    'il2'     => NULL, 
-                    'il3'     => NULL,
-                    'summa'   => $summa );
-        
-        $this->createTrans($invoice, $trans );
-        
-        return $invoice;
-    }
-    
 }

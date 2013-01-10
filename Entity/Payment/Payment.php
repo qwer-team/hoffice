@@ -134,7 +134,7 @@ class Payment extends Pd {
         
         if( $this->oldstatus == $this->status || is_null($this->oldstatus)) return;
         
-        if ($this->status == 2 || ($this->status == 1 && $this->oldstatus == 2))
+        if ($this->status == 3 || ($this->status == 2 && $this->oldstatus == 3))
         {
             $container = \Itc\AdminBundle\ItcAdminBundle::getContainer();
             $dispatcher = $container->get("event_dispatcher");

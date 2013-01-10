@@ -23,6 +23,7 @@ class Invoice extends Pd{
      */
     private $contract_id;
     /**
+     * @Assert\NotNull()
      * @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=true)
      * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", inversedBy="invoice")
      */
@@ -72,7 +73,7 @@ class Invoice extends Pd{
     }    
     /** @ORM\PostUpdate() */
     public function createTransaction(){
-        //echo "qqq";
+        echo "qqq";
     }    
 
 }

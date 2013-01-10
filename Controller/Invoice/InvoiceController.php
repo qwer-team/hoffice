@@ -26,14 +26,6 @@ use Doctrine\Common\Collections;
  */
 class InvoiceController extends Controller
 {
-    const _pdtypeId     = 1;    //invoice in pdtype
-    const _metersAccId  = 2;    //meters in rest
-    const _serviceS     = 0;    //сервис связанный с площадью квартиры
-    const _serviceM     = 1;    //сервис связанный с показаниями счетчика
-    const _serviceO     = 2;    //сервис с статической стоимостью
-    const _serviceE     = 3;    //сервис электричество
-    const _closed       = 2;    //статус закрытия квитанции
-    const _day          = 20;   //день принятия штрафных санкций
     /**
      * Lists all Invoice\Invoice entities.
      *
@@ -43,7 +35,7 @@ class InvoiceController extends Controller
      * @Template()
      */    
     public function indexAction($coulonpage = 100, $page)
-    {        
+    {
         $em = $this->getDoctrine()->getManager();
         $locale =  LanguageHelper::getLocale();
         
@@ -260,13 +252,12 @@ class InvoiceController extends Controller
         $entity  = new Invoice();
         $form = $this->createForm(new InvoiceType(), $entity);
         $form->bind($request);
-        
-        $contract=$em->getRepository("HOfficeAdminBundle:Contract\Contract")->find($entity->getContractId());
+        $contract = $em->getRepository("HOfficeAdminBundle:Contract\Contract")
+                     ->find($entity->getContract()->getId());
         $entity->setContract($contract);
-        
-        $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(self::_pdtypeId);
+        $pdtype = $em->getRepository("ItcDocumentsBundle:Pd\Pdtype")->find(1);
         $entity->setPdtype($pdtype);
-        $entity->setSumma1(0);  
+        $entity->setSumma1(0);
         if ($form->isValid()) 
         {
             $em->persist($entity);
@@ -312,10 +303,98 @@ class InvoiceController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')->find($id);
+        
+        /*$oldInvoice = $em->getRepository('HOfficeAdminBundle:Invoice\Invoice')
+                     ->createQueryBuilder( "I" )
+                     ->select('I')
+                     ->where( 'I.contract = :contract')
+                     ->setParameter( 'contract', $entity->getContract( )->getId())
+                     ->andWhere( "I.date < :date")
+                     ->setParameter( 'date', $entity->getDate() )
+                     ->orderBy( 'I.date', 'desc')
+                     ->setMaxResults( 1 )
+                     ->getQuery()
+                     ->getOneOrNullResult();*/
         $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
-        $rests = $repo->find( self::_metersAccId , array('l1'=>$entity->getContract( )->getId()), $entity->getDate()->format('Y'), $entity->getDate()->format('m') );        
+        $rests = $repo->find( 2, array('l1'=>$entity->getContract( )->getId()), $entity->getDate()->format('Y'), $entity->getDate()->format('m') );
+        echo 'Y = '.$entity->getDate()->format('Y').'<br>';
+        echo 'M = '.$entity->getDate()->format('m').'<br>';
+        echo 'Cont = '.$entity->getContract( )->getId().'<br>';
+        //echo 'obj = '.is_object($rests).'<br>';
+       // echo 'count = '.count($rests);
+//        $rests = $em->getRepository('ItcDocumentsBundle:Pd\Rest')
+//                    ->createQueryBuilder( "R" )
+//                    ->select('R')
+//                    ->where( 'R.l1 = :contractid')
+//                    ->setParameter( 'contractid', $entity->getContract( )->getId())
+//                    ->andWhere( "R.y = :year")
+//                    ->setParameter( 'year', )
+//                    ->andWhere( "R.m = :month")
+//                    ->setParameter( 'month', )
+//                    ->orderBy('R.l2')
+//                    ->getQuery()
+//                    ->execute();
+        
         $services = $entity->getContract()->getServices();
-                
+        
+        //$pdlines = new Collections\ArrayCollection();
+        
+        //if(count($entity->getPdlines())<=0)
+       // {
+//            foreach($services as $service)
+//            {
+//                //$pdlines->set( $pdline->getOa1(), $pdline );
+//                $create_new = true;
+//                foreach( $entity->getPdlines() as $pdl ){
+//                    if($service->getId() == $pdl->getOa1()){
+//                        $create_new = false;
+//                        }
+//                }
+//                if($create_new){
+//                    $pdline1 = new Pdl; 
+//                    //$pdline1->setPdid($entity->getId());
+//                    $pdline1->setOa1($service->getId());
+//                    foreach ($rests as $rest) {
+//                        if($rest->getL2()==$service->getId()){
+//                            $pdline1->setSumma2($rest->getSd());
+//                        }
+//                    }
+//                    //$pdlines->set( $pdline1->getOa1(), $pdline1 );
+//                    $entity->getPdlines()->add( $pdline1 );
+//                }
+//            }//$entity->getPdlines()->add( $pdlines);
+//        //}
+        
+        
+        
+        
+//        
+//        foreach( $services as $service ){
+//            $true = false;
+//            foreach( $entity->getPdlines() as $pdl ){
+//                
+//                $true = ( $service->getId() == $pdl->getOa1() || $pdlines->get( $service->getId() ));
+//                
+//                if( $true ) break;
+//            }
+//            
+//            if( $true ) {
+//                continue;
+//            }
+//            $pdline1 = new Pdl; 
+//            
+//            $pdline1->setPd( $entity );
+//            $pdline1->setOa1( $service->getId() ) ;
+//            $pdline1->setN( 123 ) ;
+//            
+//            $pdline1->setSumma3( $pdlines->get( $pdline->getOa1() )->getSumma4() ) ;
+//            $entity->getPdlines()->add( $pdline1 );
+//        }
+        
+        
+        
+        
+        
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
@@ -323,97 +402,30 @@ class InvoiceController extends Controller
             throw $this->createNotFoundException('Unable to find Invoice\Invoice entity.');
         }
         
-//        $serv_form = array();       
-//        $serviceM;
-//        $closed;
-//        foreach ($services as $service) 
-//        {        
-//            foreach ($entity->getPdlines() as $pdl ) 
-//            {
-//                if($pdl->getOa1()==$service->getId())
-//                {
-//                    
-//                    if($service->getKod()==self::_serviceM)
-//                    {
-//                        $serviceM = true;
-//                        foreach ($rests as $rest) {
-//                            if($service->getId()==$rest->getL2())
-//                            {
-//                               $pdl->setSumma2($pdl->getSumma2()+$rest->getSd()); 
-//                            }
-//                        }
-//                    }
-//                    else
-//                    {
-//                        $serviceM = false;
-//                    }
-//                    
-//                    
-//                    
-//                    $serv_form[] = $this->createForm(new MetersEditInvoiceType($serviceM, $closed), $pdl)->createView();
-//                }
-//            }
-//        } 
         
-        foreach ($services as $service) 
-        {
-            foreach ($entity->getPdlines() as $pdl )
-            {
-                if($service->getId() == $pdl->getOa1())
-                {
-                    echo $pdl->getOa1().'<br>';
-                }
-            }
-        } 
-
+       // $pdline1 = new Collections\ArrayCollection();
+        
+       // foreach ($services as $service) {
+       //      $search_form[] = $this->createForm(new MetersEditInvoiceType($service))->createView();
+       // }
         
         
-        $price = $this->generatePrice($entity, $entity->getContract(),$services);
         
-        $closed=$entity->getStatus()==self::_closed?true:false;
-        $editForm = $this->createForm(new EditInvoiceType($closed),$entity);
+        
+       
+        $editForm = $this->createForm(new EditInvoiceType(),$entity);
 
         return array(
-//            'serv_form'     => $serv_form,
-            'serviceM'      => self::_serviceM,
+           // 'search_form'   => $search_form,
             'rests'         => $rests,
             'entity'        => $entity,
-            'price'         => $price,
+            'sale'          => $entity->getContract()->getSale(),
             'services'      => $services,
             'edit_form'     => $editForm->createView(),
+            // 'meters_edit_form'   => $servForm->createView(),
+            // 'delete_form' => $deleteForm->createView(),
         );
     }
-    
-    private function generatePrice($Invoice, $Contract, $Services){
-        $prices=array();
-        $penalty;
-        if(($Invoice->getDate()->format('m')!=date('m')) and (date('d')>self::_day) and ($Invoice->getStatus()!=self::_closed))
-        {
-            $penalty=TRUE;
-        }
-        else
-        {
-            $penalty=FALSE;
-        }
-        $price;
-        foreach ($Services as $service) {
-             $price=$penalty?$service->getPrice1():$service->getPrice(); 
-             $prices[]= $this->typesOfServices($service->getKod(),$price, $Contract->getApartment()->getSAll());       
-        }
-
-        return $prices;
-    }
-    
-    private function typesOfServices($kod,$price,$S)
-    {
-        switch ($kod) {
-            case self::_serviceS :return $price*$S;
-            case self::_serviceM :return $price;
-            case self::_serviceO :return $price;
-            default:
-                return $price;
-            }; 
-    }  
 
     /**
      * Edits an existing Invoice\Invoice entity.

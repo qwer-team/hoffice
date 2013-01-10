@@ -37,14 +37,14 @@ class Contract extends TranslatableEntity
     /**
      * @var integer
      *
-     * @ORM\Column(name="serial_number", type="integer", nullable=true )
+     * @ORM\Column(name="serial_number", type="integer")
      */
     private $serial_number;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255, nullable=true )
+     * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;
 
@@ -58,7 +58,7 @@ class Contract extends TranslatableEntity
     /**
      * @var integer
      * @Assert\NotNull()
-     * @ORM\Column(name="user_id", type="integer", nullable=true )
+     * @ORM\Column(name="user_id", type="integer")
      */
     private $user_id;
 
@@ -71,7 +71,7 @@ class Contract extends TranslatableEntity
     /**
      * @var integer
      * @Assert\NotNull()
-     * @ORM\Column(name="apartment_id", type="integer", nullable=true )
+     * @ORM\Column(name="apartment_id", type="integer")
      */
     private $apartment_id;
 
@@ -83,7 +83,7 @@ class Contract extends TranslatableEntity
     /**
      * @var integer
      *
-     * @ORM\Column(name="sale", type="integer", nullable=true )
+     * @ORM\Column(name="sale", type="integer")
      */
     private $sale;
 
@@ -105,7 +105,7 @@ class Contract extends TranslatableEntity
      *     cascade={"persist"}
      * )
      */
-    protected $invoices;
+    protected $invoice;
     
     /**
      * @ORM\ManyToMany(
@@ -131,18 +131,16 @@ class Contract extends TranslatableEntity
 
     public function __construct() {
         parent::__construct();
-        $this->invoices = new \Doctrine\Common\Collections\ArrayCollection();   
+        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();   
         $this->services = new \Doctrine\Common\Collections\ArrayCollection();     
     }
 
-    public function getInvoices() 
-    {
-        return $this->invoices;
+    public function getInvoice() {
+        return $this->invoice;
     }
 
-    public function setInvoices($invoice) 
-    {
-        $this->invoices[] = $invoice;
+    public function setInvoice($invoice) {
+        $this->invoice = $invoice;
     }    
     /**
      * Get id

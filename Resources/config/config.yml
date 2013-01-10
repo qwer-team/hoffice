@@ -1,12 +1,8 @@
 services:
     payment.create:
-        class: HOffice\AdminBundle\Lib\Payment\PaymentService
+        class: HOffice\AdminBundle\Lib\Payment\Service
         tags:
             - { name: kernel.event_listener, event: payment.update_trans, method: onPaymentUpdateTrans }  
-    balance_month.event:
-        class: HOffice\AdminBundle\Lib\Balance\BalanceService
-        tags:
-            - { name: kernel.event_listener, event: balance_month.create_event, method: onCreateBalanceMonth }  
 imports:
     - { resource: addParameters.yml }      
 fos_user:

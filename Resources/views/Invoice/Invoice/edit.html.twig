@@ -34,6 +34,9 @@
             {{ form_row( edit_form.contract_id ) }}
         </div> 
                             <div class = 'fl'>
+            {{ form_row( edit_form.summa1 ) }}
+        </div> 
+                            <div class = 'fl'>
             {{ form_row( edit_form.ucor ) }}
         </div> 
             
@@ -46,9 +49,9 @@
         
         <br class = 'clr' />
         <hr />
-        </form>
         
-        <table class="service_list records_list counters">
+        
+            <table class="records_list counters">
         <thead>
             <tr>
                 <th>Id</th>
@@ -60,59 +63,30 @@
                 <th>Zumma</th>
             </tr>
         </thead>
-        <tbody> {% set all = 0 %}
+        <tbody>
             {% for service in services %}
-                <tr id='{{service.id}}'>
+                <tr>
                     <td>{{service.id}}</td>
                     <td>{{service.name}}</td>
-                    <td id='price'>{{price[(loop.index0)]}}{#{service.price}}<br>price1:{{service.price1}}<br>sale:{{sale}#}</td>
+                    <td>price:{{service.price}}<br>price1:{{service.price1}}<br>sale:{{sale}}</td>
                        {#% for pdline in edit_form.pdlines %}                    
                             {% if  service.id == pdline.oa1.get('value') %#}
-                            
+                            <td> 
+                                {#{ form_widget( pdline.summa2 ) }#} 
+                            </td> 
                             {#% endif %}
                         {% endfor %#}
-                  
-                    {#% for rest in rests %}
-                        {% if service.id == rest.l2 %}
-                            {% if service.kod == serviceM %}
-                                <td  id='summa2'>{{form_row(serv_form[(loop.index0)].summa2)}}</td>
-                                {% set sd = rest.sd%}
-                                {% set delta = serv_form[(loop.index0)].summa2.get('value')- rest.sd%}
-                                {% set sum = delta*price[(loop.index0)]%}                                
-                            {% else %} 
-                                <td  id='summa2'></td>
-                                {% set sd = ''%}
-                                {% set delta = ''%}
-                                {% set sum = price[(loop.index0)]%}
-                            {% endif %}
-                            {% set all = all+sum %}  
-                            {{ form_rest(serv_form[(loop.index0)]) }}
-                            <td id='sd'>{{sd}}</td>
-                            <td id='delta'>{{delta}}</td>
-                            <td id='sum'>{{sum}}</td>
+                   
+                    {% for rest in rests %}
+                        {% if  service.id == rest.l2 %}
+                            <td>{{rest.sd}}</td>
+                            <td>{{rest.od}}</td>
+                            <td>{{rest.oc}}</td>
                         {% endif %}
-                    {% endfor %#}
-                    <td  id='summa2'><input value="100"/></td>
-                             <td id='sd'>0</td>
-                            <td id='delta'>0</td>
-                            <td id='sum'>0</td>    
-                            
-                            
+                    {% endfor %}
                 </tr>
-                
         {% endfor %}
         </tbody>
-        <tfoot>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>All:</td>
-                <td id='all'>{{all}}</td>
-            </tr>
-        </tfoot>
     </table>
     <div hidden="hidden" id='err1'>Some error</div>
         <br class = 'clr' />
@@ -121,28 +95,21 @@
 
         
              {% for pdline in edit_form.pdlines %}
-                    {#{ form_row( pdline.oa1 ) }#}
+                    {{ form_row( pdline.oa1 ) }}
                     {#{ form_row( pdline.N ) }#}
-                    {#{ form_row( pdline.summa1 ) }#}
+                    {{ form_row( pdline.summa1 ) }}
                     {{ form_row( pdline.summa2 ) }}
                     {#{ form_row( pdline.pdid) }#}
 
             {% endfor %}
-        
+    
     
         {#${ form_widget(meters_edit_form) }}
         <br class = 'clr' />
         <hr />
         {{ form_rest(meters_edit_form) }#}
-
     {{ form_rest(edit_form) }}
-    
-    
-                 {#% for form in search_form %}
-                    {{ form_row( form.id ) }}
-                    {{ form_row(  form.name  ) }}
-            {% endfor %#}
-    
+    </form>
 </div>
 {#
         <form action="{{ path('invoice_delete', { 'id': entity.id }) }}" method="post">
@@ -151,4 +118,4 @@
         </form>
 #}
 
-{% endblock %}  
+{% endblock %}    

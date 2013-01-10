@@ -2,6 +2,7 @@
 
 namespace HOffice\AdminBundle\Lib\Payment;
 use Itc\DocumentsBundle\Entity\Pd\Trans;
+//use Symfony\Component\EventDispatcher\EventDispatcher;
 use HOffice\AdminBundle\Event\PaymentEvent;
 use Itc\DocumentsBundle\Entity\Pd\RestRepository;
 
@@ -10,7 +11,7 @@ use Itc\DocumentsBundle\Entity\Pd\RestRepository;
  *
  * @author root
  */
-class PaymentService {
+class Service {
     
     private $service;
     private $payment;
@@ -19,40 +20,16 @@ class PaymentService {
     private $contract;
     private $invoice;
     private $balance;
-    private $m;
-    private $y;
-    /**
-     * Регистр взаиморасчёта с детализацией по документу
-     */
-    const rest_detail = 1; 
-    /**
-     * Регистр взаиморасчёта общий
-     */
-    const rest_total = 3;
-    /**
-     * Статус оплаченого документа
-     */
-    const pd_paid = 2;
-    /**
-     * Статус неоплаченного документа
-     */
-    const pd_not_paid = 1;
-    
+
 
     function __construct($payment = null, $container = null) {
-        
         $this->payment = $payment;
         $this->container = \Itc\AdminBundle\ItcAdminBundle::getContainer();//$container;
-        list($this->y, $this->m) = explode(",", 
-            date("Y,m", mktime(0, 0, 0, date("n") + 1)));
     }    
 
     public function execute()
-    {        
-        $this->invoice = $this->payment->getInvoice();
-        $this->contract = $this->invoice->getContract();            
-        
-        if ($this->payment->getStatus() == self::pd_paid )
+    {
+        if ($this->payment->getStatus() == 3 )
         {
             $this->createPaymentTrans();
         }
@@ -61,51 +38,30 @@ class PaymentService {
             $this->deletePaymentTrans();        
         }
     }
-    /**
-     * Проведение оплаты 
-     */    
-    protected function createPaymentTrans()
-    {        
+    
+    protected function createPaymentTrans(){
+        
         $em = $this->container->get("doctrine")->getEntityManager();                       
+        
+        $this->invoice = $this->payment->getInvoice();
+        $this->contract = $this->invoice->getContract();        
         $paid_invoices = array();
         $invoices = array();
         
-        $repo = $em->getRepository("ItcDocumentsBundle:Pd\Rest");        
-        $rest_invoice = $repo->findOne( self::rest_detail , 
-            array('l1' => $this->contract->getId(),
-                  'l2' => $this->invoice->getId(),
-                  'l3' => NULL),
-                  $this->y, $this->m );
-        
-        $rest_invoice = is_object($rest_invoice) ? $rest_invoice->getSd() : 0 ;
-        $invoice_sum = $rest_invoice > 0 ? $rest_invoice : 0 ;
-        $payment_sum = $this->payment->getSumma1();
-        
-        if ($payment_sum < $invoice_sum)
-        {
-            if ( !isset($this->balance) )
-                $this->balance =  $this->getRestData(self::rest_total, 
-                    array("l1" => $this->contract->getId(),
-                          "l2" => NULL,
-                          "l3" => NULL,
-                         ));            
-            
-            $differens = $invoice_sum - $payment_sum;
-            if ( $this->balance < 0 )
-                $payment_sum += $difference > abs( $this->balance ) ? 
-                               abs( $this->balance ) : 
-                               abs( $this->balance ) - $difference ;
-        }
-        
         if ($payment_sum >= $invoice_sum)
         {
-            $this->invoice->setStatus(self::pd_paid);
-            
+            $this->invoice->setStatus(3);
         }
         
         if ($payment_sum > $invoice_sum)
         {
-            $this->createTransForPayment( $this->invoice->getId(), $invoice_sum);
+            
+            $this->addTrans( array('oaccid'  => 3,
+                                   'summa' => $invoice_sum ) );
+            $this->addTrans( array('oaccid'  => 1,
+                                   'ol2' => $this->invoice->getId(),
+                                   'summa' => $invoice_sum
+                                   ) );
             
             list($entries, $paid_invoices) = $this->expandRestSum($invoice_sum, 
                                                    $payment_sum - $invoice_sum);
@@ -114,7 +70,7 @@ class PaymentService {
             {
                 $this->addTrans( $entry );                
             }
-            
+            print_r($paid_invoices);
             if (count($paid_invoices) > 0) {
                 
                 $invoices = 
@@ -122,28 +78,32 @@ class PaymentService {
                        ->findBy( array( 'id' => $paid_invoices ) );
                 
                 foreach($invoices as $invoice){
-                    $invoice->setStatus(self::pd_paid);
+                    $invoice->setStatus(3);
                     $em->persist( $invoice );
                 }   
-                
+                echo "invoice=".$invoice->getId()."<br/>";
             }
+            print_r($this->trans);
         }
         else 
         {
-            $this->createTransForPayment( $this->invoice->getId(), $payment_sum);            
+            
+            $this->addTrans( array('oaccid'  => 3,
+                                   'summa' => $payment_sum ) );
+            $this->addTrans( array('oaccid'  => 1,
+                                   'ol2' => $this->invoice->getId(),
+                                   'summa' => $payment_sum
+                                   ) );
+            
         }
-        
+//        print_r($this->getTrans());
         foreach( Trans::getTransactions( $this->payment, $this->getTrans() )
-                                                                    as $entity )
-        {
-            $em->persist( $entity );
-        }
-        
+                        as $entity ){
+                                $em->persist( $entity );
+                                }
         $em->flush();        
     }
-    /**
-     * Отмена оплаты
-     */
+
     protected function deletePaymentTrans(){
         
         $em = $this->container->get("doctrine")->getEntityManager();                       
@@ -158,33 +118,18 @@ class PaymentService {
         }
         
         $pu->removeTransOnChangeStatusPd( $this->payment );
-        
+        print_r($invoices);
         $cancelled_invoices = 
                     $em->getRepository( 'HOfficeAdminBundle:Invoice\Invoice' )
                        ->findBy( array( 'id' => $invoices ) );
         
         foreach($cancelled_invoices as $invoice)
         {
-            $invoice->setStatus(self::pd_not_paid);
+            $invoice->setStatus(2);
             $em->persist( $invoice );
         }
         
         $em->flush();
-    }
-    /**
-     * Создание проводок для оплаты
-     * @param type $sum сумма проводок
-     * @param type $pdid ид квитанции
-     */
-    protected function createTransForPayment( $pdid, $sum )
-    {
-        $this->addTrans( array('oaccid' => self::rest_total ,
-                               'summa' => $sum 
-                               ) );
-        $this->addTrans( array('oaccid'  => self::rest_detail ,
-                               'ol2' => $pdid,
-                               'summa' => $sum
-                               ) );        
     }
 
     protected function addTrans( array $trans = NULL ){
@@ -221,94 +166,93 @@ class PaymentService {
   
     public function onPaymentUpdateTrans($event)
     {
+        $em = $this->container->get("doctrine")->getEntityManager(); 
+        
         $create = $event->getCreate();
         
-        $this->service = new PaymentService($create);
+        $this->service = new Service($create);
         $this->service->execute();
         
     }
     
-    private function getRestData($Iacc, $lvl = array())
-    {
+    private function getRestData($Iacc, $lvl = array()){
         
         $em = $this->container->get("doctrine")->getEntityManager(); 
         
         $repo = $em->getRepository( "ItcDocumentsBundle:Pd\Rest" );
 
-        $restPd = $repo->findOne( $Iacc, $lvl, $this->y, $this->m );
+        $y = date("m") == 12 ? date("Y") + 1 : date("Y");
+        $m = date("m") == 12 ? 1 : date("m") + 1;
+        
+        $restPd = $repo->findOne( $Iacc, $lvl, $y, $m );
         
         if (is_object($restPd))
-        {
             return $restPd->getSd();
-        }
+        
         return 0;
         
     }
-    /**
-     * 
-     * @param type $sum - сумма оплаченой квитанции
-     * @param type $difference - переплата по квитанции
-     * @return type
-     */
+    
     private function expandRestSum( $sum, $difference )
     {
         $em = $this->container->get("doctrine")->getEntityManager();
+        $y = date("m") == 12 ? date("Y") + 1 : date("Y");
+        $m = date("m") == 12 ? 1 : date("m") + 1;
         
-        if ( !isset($this->balance) )
-            $this->balance =  $this->getRestData(self::rest_total, 
-                array("l1" => $this->contract->getId(),
-                      "l2" => NULL,
-                      "l3" => NULL,
-                     ));
-        
-        $total_balace = $this->balance - $sum;
+        $this->balance =  $this->getRestData(3, 
+            array("l1" => $this->contract->getId(),
+                  "l2" => NULL,
+                  "l3" => NULL,
+                 ));
+        echo '<br />sum ='.$sum.", dif =".$difference.'<br />';
+        echo $this->balance."---<br/>";
+        $this->balance -= $sum;
+        echo $this->balance."---";
         $trans = array();
         $paid_invoices = array();
         
-        if ($total_balace > 0)
+        if ($this->balance > 0)
         {
             
             $repo = $em->getRepository("HOfficeAdminBundle:Invoice\Invoice");
             
             $qb = $repo->createQueryBuilder('I')
                         ->select('I')
-                        ->where('I.status = 1')
+                        ->where('I.status = 2')
                         ->andWhere('I.id != :id')
                         ->setParameter('id', $this->invoice->getId())
-                        ->orderBy('I.dtcor', 'ASC');
+                        ->orderBy('I.dtcor', 'DESC');
             
             $invoices = $qb->getQuery()->execute();
-
             foreach ($invoices as $invoice)
             {
                 if ($difference > 0){
-                    
                 $repo = $em->getRepository("ItcDocumentsBundle:Pd\Rest");        
-                $restPd = $repo->findOne( self::rest_detail , 
+                $restPd = $repo->findOne( 1 , 
                             array('l1' => $this->contract->getId(),
                                   'l2' => $invoice->getId(),
                                   'l3' => NULL),
-                                  $this->y, $this->m );
-
+                                  $y, $m );
                 $invoice_sum = $restPd->getSd() > $difference ? 
                             $difference : $restPd->getSd();
+                echo 'sum='.$difference.'inv_sum='.$invoice_sum.'restPd->getSd()'.$restPd->getSd().'<br/>';
                 $difference -= $invoice_sum;
+                echo 'sum='.$difference.'inv_sum='.$invoice_sum.'<br/>';
                 
                 if ($restPd->getSd() == $invoice_sum){
                     $paid_invoices[] = $invoice->getId();
                 }
-                $this->createTransForPayment( $invoice->getId(), $invoice_sum );  
-                
+                $trans[] = array('oaccid'  => 3,
+                                 'summa' => $invoice_sum );
+                $trans[] = array('oaccid'  => 1,
+                                 'ol2' => $invoice->getId(),
+                                 'summa' => $invoice_sum );
                 }
-                else continue;                
             }
                 
         }
-        
-        if ($difference > 0)
-            $trans[] = array('oaccid'  => self::rest_total,
-                             'summa' => $difference );
-        
+        $trans[] = array('oaccid'  => 3, 'summa' => $difference );
+     //  print_r($trans);
         return array($trans, $paid_invoices);
     }
 

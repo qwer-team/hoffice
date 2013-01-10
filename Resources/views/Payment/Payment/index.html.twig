@@ -18,13 +18,7 @@
     <h1>Payment\Payment list</h1>
 
     <div class = 'menu_sys_main_conteiner'>
-        <h1> {{ ballance_message }} </h1>
-        <div>
-            <form action="{{ path( 'payment' ) }}" method="post" {{ form_enctype( balance_form ) }}>
-                {{ form_rest( balance_form ) }}
-                <button type="submit"> Закрыть месяц </button>
-            </form>            
-        </div>
+
         <div>
             <form action="{{ path( 'payment_search' ) }}" method="post" {{ form_enctype( search_form ) }}>
                 <label> {{ "search" | trans }}:&#160; </label>
