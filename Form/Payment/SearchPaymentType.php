@@ -10,19 +10,6 @@ use Itc\AdminBundle\ItcAdminBundle;
 
 class SearchPaymentType extends AbstractType {
 
-/*
-    public function buildForm( FormBuilderInterface $builder, array $options ){
-
-        $required = array( 'required' => NULL );
-        $arra     = array( 'widget' => 'single_text', 'required' => NULL );
-
-        $builder->add( 'text', 'text', $required )
-                ->add( 'from', 'genemu_jquerydate', $arra )
-                ->add( 'to',   'genemu_jquerydate', $arra );
-
-    }
- * 
- */
     private $locale;
     private $house_id;
     /**

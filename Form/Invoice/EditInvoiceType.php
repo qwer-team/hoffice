@@ -25,7 +25,11 @@ class EditInvoiceType extends AbstractType
             //->add('oa2')
             //->add('txt1')
             //->add('txt2')
+<<<<<<< HEAD
             ->add('summa1')
+=======
+            ->add('summa1', 'hidden', array('required'=>NULL))
+>>>>>>> 0b822894732d7689a1dd4facbb9538b204b232f2
             //->add('summa2')
             //->add('summa3')
             ->add('ucor',null, $disable )
