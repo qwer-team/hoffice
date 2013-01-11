@@ -7,10 +7,11 @@ use FOS\UserBundle\Entity\User as BaseUser;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Itc\AdminBundle\Entity\User as IUser;
+
 /**
- * Itc\AdminBundle\Entity\User
+ * User
  *
- * @ORM\Table()
+ * @ORM\Table("HofficeUser")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
@@ -23,12 +24,12 @@ class User extends IUser
      *     cascade={"persist"}
      * )
      */
-    private $documents;
+    protected $documents;
     
-        public function __construct()
-        {
-            
-            $this->documents = new \Doctrine\Common\Collections\ArrayCollection();
-        }
+    public function __construct()
+    {
+        parent::__construct();
+        $this->documents = new \Doctrine\Common\Collections\ArrayCollection();
+    }
       
 }

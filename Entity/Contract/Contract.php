@@ -63,7 +63,7 @@ class Contract extends TranslatableEntity
     private $user_id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Itc\AdminBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;

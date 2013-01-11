@@ -1,3 +1,5 @@
 parameters:
     startMonth:        1        
     endMonth:          24
+    user_entity:      'HOfficeAdminBundle:User'
+    user_class:       'HOffice\AdminBundle\Entity\User'    
