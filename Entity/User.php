@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Entity\User as BaseUser;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Itc\AdminBundle\Entity\User as User;
+use Itc\AdminBundle\Entity\User as IUser;
 /**
  * Itc\AdminBundle\Entity\User
  *
@@ -14,7 +14,7 @@ use Itc\AdminBundle\Entity\User as User;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
-class User extends User
+class User extends IUser
 {
     /**
      * @ORM\OneToMany (
