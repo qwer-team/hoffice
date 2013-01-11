@@ -24,7 +24,7 @@ class Apartment
     /**
      * @var integer $houseId
      *
-     * @ORM\Column(name="houseId", type="integer")
+     * @ORM\Column(name="houseId", type="integer", nullable=true)
      */
     private $houseId;
 
@@ -38,14 +38,14 @@ class Apartment
     /**
      * @var string $name
      *
-     * @ORM\Column(name="name", type="string", length=10)
+     * @ORM\Column(name="name", type="string", length=10 )
      */
     private $name;
 
     /**
      * @var integer $floor
      *
-     * @ORM\Column(name="floor", type="smallint")
+     * @ORM\Column(name="floor", type="smallint" )
      */
     private $floor;
 

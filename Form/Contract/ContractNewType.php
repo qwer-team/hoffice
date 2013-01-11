@@ -19,8 +19,8 @@ class ContractNewType extends ContractType
                                 'required' => NULL,
     //                            'choices' => array($this->choice => ""),
                                 'attr' => array(
-                                    'class' => 'search_apartment_id' )
-                    ));
+                                    'class' => 'search_apartment_id' )) 
+                    );
     }
 
 }

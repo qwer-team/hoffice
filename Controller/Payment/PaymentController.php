@@ -44,7 +44,7 @@ class PaymentController extends ControllerHelper {
 
         $form = $this->createBalanceMonthForm();
         $form->bind($request);
-        
+        $ballance_message = "";
         if ($form->isValid()) {
             $ballance_message = $this->createBalanceMonthEvent();           
         }
@@ -472,9 +472,6 @@ class PaymentController extends ControllerHelper {
         $dispatcher = $this->get("event_dispatcher");
         $event = new BalanceMonthEvent(true);
         $dispatcher->dispatch("balance_month.create_event", $event);        
-/*        foreach($invoices as $invoice)
-            echo $invoice->getN()."===".$invoice->getId();
-  */      
         return "Месяц закрыт!";
 
     }

@@ -23,11 +23,16 @@ class ContractType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        
         $builder
             ->add('kod')
             ->add('serial_number')
             ->add('registered')
-            ->add('sale', 'text', array('required'=>NULL));
+            ->add('sale', 'text', array('required'=>NULL))
+            ->add('services', null, array(
+                        'required' => NULL,
+                        'multiple' => true ) 
+                 );   
                         
 
         $languages = $this->getLanguages();     

@@ -115,15 +115,6 @@ class Contract extends TranslatableEntity
      */
     protected $services;
     
-    public function getServices()
-    {
-        return $this->services;
-    }
-    public function setServices(\Doctrine\Common\Collections\ArrayCollection $servise)
-    {
-        $this->services = $servise;
-        return $this;
-    }
     
     function __toString(){
         return is_null( $this->title ) ? "" : $this->title ;
@@ -135,6 +126,14 @@ class Contract extends TranslatableEntity
         $this->services = new \Doctrine\Common\Collections\ArrayCollection();     
     }
 
+    public function getServices()
+    {
+        return $this->services;
+    }
+    public function setServices($servise)
+    {
+        $this->services[] = $servise;
+    }
     public function getInvoices() 
     {
         return $this->invoices;

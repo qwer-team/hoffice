@@ -90,7 +90,7 @@ class PaymentService {
                           "l3" => NULL,
                          ));            
             
-            $differens = $invoice_sum - $payment_sum;
+            $difference = $invoice_sum - $payment_sum;
             if ( $this->balance < 0 )
                 $payment_sum += $difference > abs( $this->balance ) ? 
                                abs( $this->balance ) : 

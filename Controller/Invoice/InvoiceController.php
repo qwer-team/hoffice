@@ -28,7 +28,8 @@ class InvoiceController extends Controller
 {
     const _pdtypeId     = 1;    //invoice in pdtype
     const _metersAccId  = 2;    //meters in rest
-    const _serviceS     = 0;    //сервис связанный с площадью квартиры
+    const _serviceSall  = 0;    //сервис связанный с общей площадью квартиры
+    const _serviceSh    = 4;    //сервис связанный с отапливаемой площадью квартиры
     const _serviceM     = 1;    //сервис связанный с показаниями счетчика
     const _serviceO     = 2;    //сервис с статической стоимостью
     const _serviceE     = 3;    //сервис электричество
@@ -62,7 +63,7 @@ class InvoiceController extends Controller
             $coulonpage/*limit per page*/
         );
         $search_form = $this->createForm(new SearchInvoiceType($em, $locale));
-
+        
         return array(
             'entities' => $entities,
             'search_form' => $search_form->createView(),
@@ -398,16 +399,19 @@ class InvoiceController extends Controller
         $price;
         foreach ($Services as $service) {
              $price=$penalty?$service->getPrice1():$service->getPrice(); 
-             $prices[]= $this->typesOfServices($service->getKod(),$price, $Contract->getApartment()->getSAll());       
+             $prices[]= $this->typesOfServices($service->getKod(),$price, $Contract->getApartment());       
         }
 
         return $prices;
     }
     
-    private function typesOfServices($kod,$price,$S)
+    private function typesOfServices($kod,$price,$apartment)
     {
         switch ($kod) {
-            case self::_serviceS :return $price*$S;
+            case self::_serviceSall :
+                        return $price * $apartment->getSAll();
+            case self::_serviceSh :
+                        return $price * $apartment->getSLive();
             case self::_serviceM :return $price;
             case self::_serviceO :return $price;
             default:

@@ -23,8 +23,10 @@ class Invoice extends Pd{
      */
     private $contract_id;
     /**
-     * @ORM\JoinColumn(name="contract_id", referencedColumnName="id", nullable=true)
-     * @ORM\ManyToOne(targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", inversedBy="invoice")
+     * @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
+     * @ORM\ManyToOne(
+     * targetEntity="HOffice\AdminBundle\Entity\Contract\Contract", 
+     * inversedBy="invoice")
      */
     private $contract;
     /**

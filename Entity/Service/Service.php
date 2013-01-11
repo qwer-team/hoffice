@@ -64,7 +64,7 @@ class Service
     private $contracts;
     /**
      * @var string
-     * @ORM\Column(name="tag", type="string", length=255)
+     * @ORM\Column(name="tag", type="string", length=255, nullable=true)
      */
     private $tag;
     
@@ -238,4 +238,8 @@ class Service
     {
         return $this->unit;
     }
+    public function __toString() {
+        return $this->name;
+    }
+
 }
